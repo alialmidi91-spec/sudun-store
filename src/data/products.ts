@@ -1,0 +1,123 @@
+import type { Product } from '../types';
+
+/**
+ * منتجات سُدَن — مأخوذة من منشورات حساب إنستغرام @sudun_hijab
+ * ---------------------------------------------------------------
+ * - الأسعار والعروض والأوصاف كما وردت في المنشورات.
+ * - أسماء الألوان وصف لما يظهر في الصورة، وتحتاج تأكيد المتجر.
+ * - sizes: [] تعني أن القياس لم يُحدَّد بعد (لا يظهر للزبونة).
+ * - material غير موجود = الخامة لم تُذكر في المنشور.
+ * - addedAt: تاريخ المنشور. '' = غير معروف (يظهر بآخر ترتيب "الأحدث").
+ *
+ * لإضافة صور أكثر: ضعيها في public/images/products/ وأضيفي مسارها إلى images.
+ */
+export const products: Product[] = [
+  {
+    id: 'sd-001',
+    slug: 'silk-lebanese-floral',
+    name: 'ربطة حرير لبناني مشجر',
+    shortDescription: 'ربطة حرير لبناني بنقشة مشجرة، قياس 150 سم',
+    description: 'ربطة حرير لبناني مشجر بقياس 150 سم.',
+    category: 'rabta',
+    material: 'silk-lebanese',
+    colors: [{ name: 'مشجر وردي وليلكي', hex: '#E3BFD0', family: 'printed' }],
+    sizes: ['150 سم'],
+    price: 12000,
+    offer: { quantity: 2, price: 24000, freeDelivery: true },
+    inStock: true,
+    images: ['/images/products/silk-lebanese-floral.webp'],
+    addedAt: '',
+  },
+  {
+    id: 'sd-002',
+    slug: 'chiffon-rabta-floral',
+    name: 'ربطة شيفون',
+    shortDescription: 'ربطة شيفون بنقشة ناعمة',
+    description: 'ربطة شيفون بنقشة ناعمة.',
+    category: 'rabta',
+    material: 'chiffon',
+    colors: [{ name: 'أبيض بنقشة وردية وزرقاء', hex: '#EEE6E4', family: 'printed' }],
+    sizes: [],
+    price: 8000,
+    offer: { quantity: 3, price: 25000, freeDelivery: true },
+    inStock: true,
+    images: ['/images/products/chiffon-rabta-floral.webp'],
+    addedAt: '2026-09-17',
+  },
+  {
+    id: 'sd-003',
+    slug: 'georgette-ninja-shawl',
+    name: 'شال جرجيت متصل بكب نينجا',
+    shortDescription: 'خامة باردة وخفيفة، ينلبس بدون دبابيس',
+    description:
+      'خامة باردة وخفيفة، سهل اللف وحتى ينلبس بدون دبابيس. متصل بكب نينجا، مجرد تلبسيه وما تحتاجين أي كب أو دبابيس نهائياً. شكله كلش مرتب.',
+    category: 'ninja',
+    material: 'georgette',
+    colors: [{ name: 'عاجي', hex: '#F1ECDF', family: 'neutral' }],
+    sizes: [],
+    price: 10000,
+    inStock: true,
+    images: ['/images/products/georgette-ninja-cream.webp'],
+    addedAt: '',
+  },
+  {
+    id: 'sd-004',
+    slug: 'ninja-shawl',
+    name: 'شال متصل بكب نينجا',
+    shortDescription: 'شال متصل بكب نينجا',
+    description: 'شال متصل بكب نينجا.',
+    category: 'ninja',
+    colors: [{ name: 'بيج', hex: '#D8C3B4', family: 'neutral' }],
+    sizes: [],
+    price: 9000,
+    offer: { quantity: 3, price: 25000, freeDelivery: true },
+    inStock: true,
+    images: ['/images/products/ninja-shawl-beige.webp'],
+    addedAt: '2026-10-14',
+  },
+  {
+    id: 'sd-005',
+    slug: 'organza-curly-shawl',
+    name: 'شال أورگنزا كيرلي',
+    shortDescription: 'شال أورگنزا بملمس كيرلي',
+    description: 'شال أورگنزا كيرلي.',
+    category: 'shawl',
+    material: 'organza',
+    colors: [{ name: 'أسود', hex: '#1E1E1E', family: 'black' }],
+    sizes: [],
+    price: 10000,
+    inStock: true,
+    images: ['/images/products/organza-curly-black.webp'],
+    addedAt: '2026-09-11',
+  },
+  {
+    id: 'sd-006',
+    slug: 'cotton-shawl',
+    name: 'شال قطن',
+    shortDescription: 'شال قطن بنقشة رخامية',
+    description: 'شال قطن.',
+    category: 'shawl',
+    material: 'cotton',
+    colors: [{ name: 'رخامي رمادي', hex: '#A7A9AE', family: 'printed' }],
+    sizes: [],
+    price: 13000,
+    inStock: true,
+    images: ['/images/products/cotton-shawl-marble.webp'],
+    addedAt: '',
+  },
+  {
+    id: 'sd-007',
+    slug: 'jafsa-shash',
+    name: 'شاش جفسة',
+    shortDescription: 'شاش جفسة',
+    description: 'شاش جفسة.',
+    category: 'shash',
+    material: 'jafsa',
+    colors: [{ name: 'زيتوني', hex: '#77735F', family: 'green' }],
+    sizes: [],
+    price: 8000,
+    inStock: true,
+    images: ['/images/products/jafsa-olive.webp'],
+    addedAt: '2026-08-21',
+  },
+];
