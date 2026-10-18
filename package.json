@@ -6,7 +6,8 @@
   "description": "SADAN | سدن — متجر حجابات نسائية، طلب عبر واتساب ودفع عند الاستلام",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:check": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run"
@@ -24,5 +25,8 @@
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
     "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
