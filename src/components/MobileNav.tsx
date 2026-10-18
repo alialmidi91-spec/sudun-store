@@ -5,7 +5,7 @@ import { storeChatUrl } from '../lib/whatsapp';
 import { WhatsappIcon } from './Brand';
 
 /**
- * شريط تنقل سفلي للموبايل فقط (يختفي بالحاسوب).
+ * شريط تنقل سفلي للموبايل فقط (أقل من 600px)، ويختفي بالتابلت والحاسوب.
  * في صفحة المنتج يُخفى لأن شريط الشراء الثابت يحل محله.
  */
 export function MobileNav() {

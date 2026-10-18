@@ -14,7 +14,7 @@ import { useAsync } from '../hooks/useAsync';
 import { useSeo } from '../hooks/useSeo';
 import { fetchProductBySlug } from '../lib/catalog';
 import { clampQty } from '../lib/cart-math';
-import { formatIQD } from '../lib/format';
+import { formatIQD, piecesLabel } from '../lib/format';
 import NotFoundPage from './NotFoundPage';
 
 export default function ProductPage() {
@@ -56,11 +56,25 @@ function ProductDetail({ productId }: { productId: string }) {
   const actionsRef = useRef<HTMLDivElement>(null);
   const [showBar, setShowBar] = useState(false);
   useEffect(() => {
-    const el = actionsRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-    const io = new IntersectionObserver(([entry]) => setShowBar(!entry.isIntersecting && entry.boundingClientRect.top < 0));
-    io.observe(el);
-    return () => io.disconnect();
+    // نتابع موضع التمرير مباشرة (وليس فقط لحظة دخول/خروج الأزرار) حتى يظهر الشريط
+    // حتى لو قفزت الصفحة فوق الأزرار مرة وحدة، مثل التمرير السريع أو استرجاع موضع الصفحة
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const el = actionsRef.current;
+      if (el) setShowBar(el.getBoundingClientRect().bottom < 0);
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
   useEffect(() => {
     document.body.classList.add('has-buybar');
@@ -145,7 +159,7 @@ function ProductDetail({ productId }: { productId: string }) {
           <p className="pdp__short">{product.shortDescription}</p>
           {product.offer && (
             <p className="offer-note">
-              <strong>عرض:</strong> كل {product.offer.quantity} قطع بـ {formatIQD(product.offer.price)}
+              <strong>عرض:</strong> كل {piecesLabel(product.offer.quantity)} بـ {formatIQD(product.offer.price)}
               {product.offer.freeDelivery ? ' مع توصيل مجاني' : ''}. يُحسب تلقائياً في السلة.
             </p>
           )}
