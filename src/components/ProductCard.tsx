@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { categories, materialLabel } from '../data/taxonomy';
-import { formatIQD } from '../lib/format';
+import { formatIQD, piecesLabel } from '../lib/format';
 import type { Product } from '../types';
 import { ProductImage } from './ProductImage';
 import { Price, ProductBadges } from './ui';
@@ -11,8 +11,7 @@ import { Price, ProductBadges } from './ui';
 /** نص العرض المختصر: "3 قطع بـ 25,000" */
 export function offerShort(p: Product): string | null {
   if (!p.offer) return null;
-  const n = p.offer.quantity === 2 ? 'قطعتين' : `${p.offer.quantity} قطع`;
-  return `${n} بـ ${formatIQD(p.offer.price)}`;
+  return `${piecesLabel(p.offer.quantity)} بـ ${formatIQD(p.offer.price)}`;
 }
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {

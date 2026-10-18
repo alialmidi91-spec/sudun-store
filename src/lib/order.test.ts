@@ -3,8 +3,9 @@ import { products } from '../data/products';
 import type { CartLine, CustomerInfo } from '../types';
 import { applyFilters, emptyFilters } from './catalog';
 import { cartCount, cartSubtotal, clampQty, lineKey, priceOrder } from './cart-math';
-import { formatIQD, normalizeArabic, normalizeDigits } from './format';
+import { formatIQD, normalizeArabic, normalizeDigits, piecesLabel } from './format';
 import { normalizeIraqiPhone } from './phone';
+import { getDeliveryFee, siteConfig } from '../config/site';
 import { buildOrderMessage, buildWhatsappUrl } from './whatsapp';
 
 const offerOf = (id: string) => products.find((p) => p.id === id)?.offer;
@@ -24,6 +25,12 @@ const customer: CustomerInfo = {
 };
 
 describe('formatting', () => {
+  it('uses natural Arabic piece counts', () => {
+    expect(piecesLabel(1)).toBe('قطعة وحدة');
+    expect(piecesLabel(2)).toBe('قطعتين');
+    expect(piecesLabel(3)).toBe('3 قطع');
+    expect(piecesLabel(11)).toBe('11 قطعة');
+  });
   it('formats IQD with thousands separators', () => {
     expect(formatIQD(15000)).toBe('15,000 د.ع');
     expect(formatIQD(1234567.6)).toBe('1,234,568 د.ع');
@@ -50,6 +57,15 @@ describe('phone validation', () => {
   });
 });
 
+const L = (productId: string, qty: number, color = 'x'): CartLine => {
+  const p = products.find((x) => x.id === productId)!;
+  return { key: lineKey(productId, color), productId, slug: p.slug, name: p.name, price: p.price, color, quantity: qty };
+};
+// sd-001 حرير 12,000 (قطعتين 24,000 + توصيل مجاني) · sd-002 شيفون 8,000 (3 بـ 25,000 + توصيل مجاني)
+// sd-004 نينجا 9,000 (3 بـ 25,000 + توصيل مجاني) · sd-003 جرجيت 10,000 (بدون عرض)
+const KARBALA = 3000;
+const OTHER = 5000;
+
 describe('cart math', () => {
   it('computes subtotal and count in integer dinars', () => {
     expect(cartSubtotal(lines)).toBe(44000);
@@ -60,34 +76,71 @@ describe('cart math', () => {
     expect(clampQty(99)).toBe(20);
     expect(clampQty(2.7)).toBe(2);
   });
-  it('adds delivery fee when no offer applies', () => {
-    const p = priceOrder(lines, offerOf, 5000);
+  it('empty cart totals zero', () => {
+    const p = priceOrder([], offerOf, null);
+    expect(p.subtotal).toBe(0);
+    expect(p.total).toBe(0);
     expect(p.applied.length).toBe(0);
-    expect(p.total).toBe(49000);
+  });
+  it('adds delivery fee when no offer applies', () => {
+    expect(priceOrder(lines, offerOf, OTHER).total).toBe(49000);
+    expect(priceOrder([L('sd-004', 1)], offerOf, KARBALA).total).toBe(12000);
     expect(priceOrder(lines, offerOf, null).deliveryKnown).toBe(false);
   });
-  it('applies chiffon offer: 3 for 25,000 with free delivery', () => {
-    const chiffon: CartLine[] = [{ key: 'c', productId: 'sd-002', slug: 'x', name: 'ربطة شيفون', price: 8000, quantity: 3 }];
-    const p = priceOrder(chiffon, offerOf, 5000);
-    expect(p.applied[0].offerTotal).toBe(25000);
-    expect(p.freeDelivery).toBe(true);
-    expect(p.total).toBe(25000);
+  it('ninja offer: 3 for 25,000 with free delivery, remainder at normal price', () => {
+    expect(priceOrder([L('sd-004', 3)], offerOf, OTHER).total).toBe(25000);
+    const four = priceOrder([L('sd-004', 2, 'a'), L('sd-004', 2, 'b')], offerOf, OTHER);
+    expect(four.applied[0].bundles).toBe(1);
+    expect(four.total).toBe(34000);
+    const six = priceOrder([L('sd-004', 6)], offerOf, KARBALA);
+    expect(six.applied[0].bundles).toBe(2);
+    expect(six.total).toBe(50000);
   });
-  it('applies offer per product across colors and charges the remainder normally', () => {
-    const ninja: CartLine[] = [
-      { key: 'a', productId: 'sd-004', slug: 'x', name: 'شال متصل بكب نينجا', price: 9000, color: 'بيج', quantity: 2 },
-      { key: 'b', productId: 'sd-004', slug: 'x', name: 'شال متصل بكب نينجا', price: 9000, color: 'أسود', quantity: 2 },
-    ];
-    const p = priceOrder(ninja, offerOf, 3000);
-    expect(p.applied[0].bundles).toBe(1);
-    expect(p.productsTotal).toBe(34000);
-    expect(p.total).toBe(34000);
+  it('chiffon offer applies alone because free delivery makes it cheaper', () => {
+    const k = priceOrder([L('sd-002', 3)], offerOf, KARBALA);
+    expect(k.applied.length).toBe(1);
+    expect(k.total).toBe(25000);
+    expect(priceOrder([L('sd-002', 3)], offerOf, OTHER).total).toBe(25000);
+  });
+  it('never charges more for an offer when delivery is already free', () => {
+    const p = priceOrder([L('sd-001', 2), L('sd-002', 3)], offerOf, OTHER);
+    expect(p.freeDelivery).toBe(true);
+    expect(p.applied.map((a) => a.productId)).toEqual(['sd-001']);
+    expect(p.total).toBe(48000);
+    const six = priceOrder([L('sd-002', 6)], offerOf, OTHER);
+    expect(six.applied[0].bundles).toBe(1);
+    expect(six.total).toBe(49000);
+  });
+  it('counts free delivery once with two offers', () => {
+    const p = priceOrder([L('sd-001', 2), L('sd-004', 3), L('sd-003', 1)], offerOf, OTHER);
+    expect(p.applied.length).toBe(2);
+    expect(p.deliveryFee).toBe(0);
+    expect(p.total).toBe(24000 + 25000 + 10000);
+  });
+  it('picks offers before the governorate is chosen using the estimate', () => {
+    const p = priceOrder([L('sd-002', 3)], offerOf, null, OTHER);
+    expect(p.freeDelivery).toBe(true);
+    expect(p.deliveryKnown).toBe(true);
+    expect(p.total).toBe(25000);
+    expect(priceOrder([L('sd-004', 1)], offerOf, null, OTHER).deliveryKnown).toBe(false);
   });
   it('does not apply offer below the quantity', () => {
-    const silk: CartLine[] = [{ key: 's', productId: 'sd-001', slug: 'x', name: 'ربطة حرير', price: 12000, quantity: 1 }];
-    const p = priceOrder(silk, offerOf, 3000);
+    const p = priceOrder([L('sd-001', 1)], offerOf, KARBALA);
     expect(p.applied.length).toBe(0);
     expect(p.total).toBe(15000);
+  });
+});
+
+describe('store settings', () => {
+  it('keeps the business WhatsApp number', () => {
+    expect(siteConfig.whatsappNumber).toBe('9647777795064');
+    expect(siteConfig.whatsappDisplay.replace(/[^\d]/g, '')).toBe(siteConfig.whatsappNumber);
+    expect(normalizeIraqiPhone(siteConfig.whatsappDisplay)).toBe('07777795064');
+  });
+  it('uses the confirmed delivery fees', () => {
+    expect(getDeliveryFee('كربلاء')).toBe(3000);
+    expect(getDeliveryFee('بغداد')).toBe(5000);
+    expect(getDeliveryFee('البصرة')).toBe(5000);
   });
 });
 
@@ -106,6 +159,7 @@ describe('whatsapp message', () => {
       'الكمية: 2 × 10,000 د.ع = 20,000 د.ع',
       '2) شاش جفسة',
       'الكمية: 3 × 8,000 د.ع = 24,000 د.ع',
+      'عدد القطع: 5',
       'مجموع المنتجات: 44,000 د.ع',
       'أجور التوصيل: 5,000 د.ع',
       'المبلغ الإجمالي النهائي: 49,000 د.ع',
@@ -115,16 +169,19 @@ describe('whatsapp message', () => {
     }
   });
 
-  it('lists applied offers and free delivery', () => {
-    const chiffon: CartLine[] = [{ key: 'c', productId: 'sd-002', slug: 'x', name: 'ربطة شيفون', price: 8000, quantity: 3 }];
-    const m = buildOrderMessage(chiffon, customer, priceOrder(chiffon, offerOf, 5000));
-    expect(m).toContain('• ربطة شيفون: 3 قطع بـ 25,000 د.ع مع توصيل مجاني');
+  it('lists applied offers and shows free delivery once', () => {
+    const cart = [L('sd-001', 2), L('sd-004', 3)];
+    const m = buildOrderMessage(cart, customer, priceOrder(cart, offerOf, 5000));
+    expect(m).toContain('• ربطة حرير لبناني مشجر: قطعتين بـ 24,000 د.ع = 24,000 د.ع');
+    expect(m).toContain('• شال متصل بكب نينجا: 3 قطع بـ 25,000 د.ع = 25,000 د.ع');
+    expect(m).toContain('المجموع بعد تطبيق العروض: 49,000 د.ع');
     expect(m).toContain('أجور التوصيل: مجاني (ضمن العرض)');
-    expect(m).toContain('المبلغ الإجمالي النهائي: 25,000 د.ع');
+    expect(m).toContain('المبلغ الإجمالي النهائي: 49,000 د.ع');
+    expect(m.split('توصيل مجاني').length - 1).toBe(0);
   });
 
   it('encodes the wa.me URL so it round-trips exactly', () => {
-    const url = buildWhatsappUrl(msg, '9647777795064');
+    const url = buildWhatsappUrl(msg);
     expect(url.startsWith('https://wa.me/9647777795064?text=')).toBe(true);
     expect(url).not.toContain(' ');
     const decoded = decodeURIComponent(url.split('?text=')[1]);

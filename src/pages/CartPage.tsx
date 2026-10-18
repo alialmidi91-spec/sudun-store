@@ -8,8 +8,8 @@ import { useCart } from '../context/CartContext';
 import { products } from '../data/products';
 import { governorates } from '../data/taxonomy';
 import { useSeo } from '../hooks/useSeo';
-import { lineTotal, priceOrder } from '../lib/cart-math';
-import { formatIQD } from '../lib/format';
+import { cartCount, lineTotal, priceOrder } from '../lib/cart-math';
+import { formatIQD, piecesLabel } from '../lib/format';
 import { normalizeIraqiPhone } from '../lib/phone';
 import { readStorage, writeStorage } from '../lib/storage';
 import { buildOrderMessage, buildWhatsappUrl } from '../lib/whatsapp';
@@ -52,15 +52,18 @@ export default function CartPage() {
 
   const deliveryFee = customer.governorate ? getDeliveryFee(customer.governorate) : null;
   const thumbs = useMemo(() => new Map(products.map((p) => [p.id, p])), []);
-  const totals = priceOrder(lines, (id) => thumbs.get(id)?.offer, deliveryFee);
+  const totals = priceOrder(lines, (id) => thumbs.get(id)?.offer, deliveryFee, siteConfig.defaultDeliveryFee);
+  const pieces = cartCount(lines);
   // تلميح: كم قطعة تبقّت لاكتمال العرض
   const offerHints = Array.from(
     lines.reduce((m, l) => m.set(l.productId, (m.get(l.productId) ?? 0) + l.quantity), new Map<string, number>()),
   ).flatMap(([id, qty]) => {
     const p = thumbs.get(id);
     if (!p?.offer || qty % p.offer.quantity === 0) return [];
+    // لا نقترح عرضاً لا يوفّر شيئاً (سعره أعلى من القطع العادية والتوصيل مجاني أصلاً)
+    if (p.offer.price >= p.offer.quantity * p.price && totals.freeDelivery) return [];
     const left = p.offer.quantity - (qty % p.offer.quantity);
-    return [`أضيفي ${left === 1 ? 'قطعة وحدة' : `${left} قطع`} من «${p.name}» وتحصلين عرض ${p.offer.quantity} قطع بـ ${formatIQD(p.offer.price)}${p.offer.freeDelivery ? ' مع توصيل مجاني' : ''}.`];
+    return [`أضيفي ${piecesLabel(left)} من «${p.name}» وتحصلين عرض ${piecesLabel(p.offer.quantity)} بـ ${formatIQD(p.offer.price)}${p.offer.freeDelivery ? ' مع توصيل مجاني' : ''}.`];
   });
   const orderMessage = () =>
     buildOrderMessage(lines, { ...customer, phone: normalizeIraqiPhone(customer.phone) ?? customer.phone }, totals);
@@ -115,11 +118,11 @@ export default function CartPage() {
               <strong>الطلب ما يوصلنا إلا بعد ما تضغطين «إرسال» داخل واتساب.</strong> بعد الإرسال، فريق {siteConfig.nameAr} يراجع الطلب ويتواصل وياچ لتأكيده
               {totals.deliveryKnown ? '.' : ' وتأكيد أجور التوصيل.'}
             </p>
-            <p className="muted">إذا ما انفتح واتساب، اضغطي الزر مرة ثانية أو تأكدي إن المتصفح ما منع النافذة المنبثقة.</p>
+            <p className="muted">إذا ما انفتح واتساب، اضغطي زر «افتحي واتساب» تحت.</p>
             <div className="sent-card__actions">
               {lines.length > 0 && (
                 <a className="btn btn--dark" href={buildWhatsappUrl(orderMessage())} target="_blank" rel="noopener noreferrer">
-                  <WhatsappIcon size={18} /> فتح واتساب مرة ثانية
+                  <WhatsappIcon size={18} /> افتحي واتساب
                 </a>
               )}
               <button type="button" className="btn btn--outline" onClick={() => setSent(false)}>
@@ -151,7 +154,7 @@ export default function CartPage() {
       <div className="container cart">
         <section className="cart__items" aria-labelledby="cart-items-title">
           <h2 id="cart-items-title" className="cart__heading">
-            المنتجات <span className="muted">({lines.length})</span>
+            المنتجات <span className="muted">({piecesLabel(pieces)})</span>
           </h2>
           <ul className="cart-lines">
             {lines.map((line) => {
@@ -241,7 +244,7 @@ export default function CartPage() {
                 {totals.applied.map((o) => (
                   <div key={o.productId} className="summary__offer">
                     <dt>
-                      عرض {o.name} ({o.bundles > 1 ? `${o.bundles} × ` : ''}{o.quantity} قطع{o.freeDelivery ? ' + توصيل مجاني' : ''})
+                      عرض {o.name} ({o.bundles > 1 ? `${o.bundles} × ` : ''}{piecesLabel(o.quantity)})
                     </dt>
                     <dd>{formatIQD(o.offerTotal)}</dd>
                   </div>

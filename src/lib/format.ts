@@ -32,3 +32,11 @@ export function normalizeArabic(input: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+/** صيغة العدد بالعربي: قطعة · قطعتين · 3 قطع · 11 قطعة */
+export function piecesLabel(n: number): string {
+  if (n === 1) return 'قطعة وحدة';
+  if (n === 2) return 'قطعتين';
+  if (n >= 3 && n <= 10) return `${n} قطع`;
+  return `${n} قطعة`;
+}

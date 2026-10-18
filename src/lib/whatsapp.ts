@@ -1,7 +1,7 @@
 import { isWhatsappConfigured, siteConfig } from '../config/site';
 import type { CartLine, CustomerInfo } from '../types';
 import { clampQty, lineTotal, type OrderPricing } from './cart-math';
-import { formatIQD } from './format';
+import { formatIQD, piecesLabel } from './format';
 
 /** يبني نص رسالة الطلب (نص عادي، بدون ترميز) */
 export function buildOrderMessage(lines: CartLine[], customer: CustomerInfo, pricing: OrderPricing): string {
@@ -21,7 +21,7 @@ export function buildOrderMessage(lines: CartLine[], customer: CustomerInfo, pri
 
   const offers = pricing.applied.map(
     (a) =>
-      `• ${a.name}: ${a.bundles > 1 ? `${a.bundles} × ` : ''}${a.quantity} قطع بـ ${formatIQD(a.price)}${a.freeDelivery ? ' مع توصيل مجاني' : ''}`,
+      `• ${a.name}: ${a.bundles > 1 ? `${a.bundles} × ` : ''}${piecesLabel(a.quantity)} بـ ${formatIQD(a.price)} = ${formatIQD(a.offerTotal)}`,
   );
 
   const deliveryLine = pricing.freeDelivery
@@ -48,6 +48,7 @@ export function buildOrderMessage(lines: CartLine[], customer: CustomerInfo, pri
     ...items,
     '',
     '— الحساب —',
+    `عدد القطع: ${lines.reduce((n, l) => n + clampQty(l.quantity), 0)}`,
     `مجموع المنتجات: ${formatIQD(pricing.subtotal)}`,
     ...(offers.length ? ['العروض المطبّقة:', ...offers, `المجموع بعد تطبيق العروض: ${formatIQD(pricing.productsTotal)}`] : []),
     deliveryLine,

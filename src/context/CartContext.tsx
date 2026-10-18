@@ -69,7 +69,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // مزامنة السلة بين أكثر من تبويب
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setLines(readStorage(STORAGE_KEY, [], isCartLines));
+      if (e.key === STORAGE_KEY) setLines(syncWithCatalog(readStorage(STORAGE_KEY, [], isCartLines)));
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
