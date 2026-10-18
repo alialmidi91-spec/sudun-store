@@ -1,17 +1,19 @@
-import { ArrowLeft, Banknote, MessageCircle, Truck } from 'lucide-react';
+import { ArrowLeft, Banknote, MapPin, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { InstagramIcon, WhatsappIcon } from '../components/Brand';
+import { offerShort, ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
 import { ProductImage } from '../components/ProductImage';
-import { ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
-import { Accordion, DemoNotice, ErrorState, SectionHeading } from '../components/ui';
+import { Accordion, ErrorState, SectionHeading } from '../components/ui';
 import { siteConfig } from '../config/site';
 import { faqs } from '../data/faqs';
 import { products } from '../data/products';
 import { categories, colorFamilies, materials } from '../data/taxonomy';
-import { formatIQD } from '../lib/format';
 import { useAsync } from '../hooks/useAsync';
 import { useSeo } from '../hooks/useSeo';
 import { applyFilters, emptyFilters, fetchProducts } from '../lib/catalog';
-import type { CategoryId, MaterialId, Product } from '../types';
+import { formatIQD } from '../lib/format';
+import { storeChatUrl } from '../lib/whatsapp';
+import type { CategoryId, ColorFamily, MaterialId } from '../types';
 
 /** أول منتج من كل نوع يُستخدم كصورة للتصنيف */
 const categoryCover = (id: CategoryId) => products.find((p) => p.category === id && p.images.length);
@@ -20,62 +22,30 @@ const productBySlug = (slug: string) => products.find((p) => p.slug === slug);
 const HERO_MAIN = productBySlug('silk-lebanese-floral');
 const HERO_SMALL = productBySlug('georgette-ninja-shawl');
 
-function ProductRail({
-  eyebrow,
-  title,
-  link,
-  pick,
-}: {
-  eyebrow: string;
-  title: string;
-  link: string;
-  pick: (all: Product[]) => Product[];
-}) {
-  const { state, retry } = useAsync(fetchProducts);
-  if (state.status === 'success' && pick(state.data).length === 0) return null;
-  return (
-    <section className="section">
-      <div className="container">
-        <SectionHeading
-          eyebrow={eyebrow}
-          title={title}
-          action={
-            <Link to={link} className="link-arrow">
-              عرض الكل <ArrowLeft size={16} aria-hidden="true" />
-            </Link>
-          }
-        />
-        {state.status === 'loading' && <ProductGridSkeleton count={4} />}
-        {state.status === 'error' && <ErrorState onRetry={retry} />}
-        {state.status === 'success' && <ProductGrid products={pick(state.data).slice(0, 4)} />}
-      </div>
-    </section>
-  );
+/** صور منشورات البراند على إنستغرام */
+const instagramPosts = [
+  { src: '/images/brand/brand-style.webp', alt: 'الحجاب مو بس ستر… هو أسلوب وأناقة' },
+  { src: '/images/brand/brand-details.webp', alt: 'الأناقة مو بالملابس الكثيرة… الأناقة بالتفاصيل' },
+  { src: '/images/brand/brand-about.webp', alt: 'سُدَن براند عراقي يقدم حجابات' },
+];
+
+function Ornament({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
+  return <img className="ornament" src={`/brand/star-${tone}.png`} alt="" aria-hidden="true" width={259} height={256} />;
 }
 
 export default function HomePage() {
   useSeo({});
+  const { state, retry } = useAsync(fetchProducts);
+  const latest = state.status === 'success' ? applyFilters(state.data, emptyFilters) : [];
+  const offers = products.filter((p) => p.offer);
+  const wa = storeChatUrl();
 
   return (
     <>
-      {/* 3. Hero */}
+      {/* 1. Hero بهوية سُدَن */}
       <section className="hero">
+        <img className="hero__pattern" src="/brand/star-light.png" alt="" aria-hidden="true" />
         <div className="container hero__grid">
-          <div className="hero__content">
-            <p className="eyebrow hero__eyebrow">{siteConfig.nameAr} · {siteConfig.nameEn}</p>
-            <h1 className="hero__title">أناقتچ تبدأ من سُدَن</h1>
-            <p className="hero__text">
-              براند عراقي يقدم حجابات تجمع بين الأناقة، الجودة، والراحة بكل تفاصيلها. توصيل لجميع محافظات العراق خلال {siteConfig.deliveryTime}، والدفع عند الاستلام.
-            </p>
-            <div className="hero__actions">
-              <Link to="/shop" className="btn btn--dark btn--lg">
-                تسوّقي الآن
-              </Link>
-              <Link to="/shop?offers=1" className="btn btn--outline btn--lg">
-                شوفي العروض
-              </Link>
-            </div>
-          </div>
           <div className="hero__visual">
             {HERO_MAIN && (
               <Link to={`/product/${HERO_MAIN.slug}`} className="hero__arch" aria-label={HERO_MAIN.name}>
@@ -88,136 +58,137 @@ export default function HomePage() {
               </Link>
             )}
           </div>
-        </div>
-      </section>
-
-      {/* شريط الثقة */}
-      <section className="trust" aria-label="طريقة الطلب">
-        <div className="container trust__grid">
-          <div className="trust__item">
-            <MessageCircle size={22} aria-hidden="true" />
-            <div>
-              <p className="trust__title">اطلبي عبر واتساب أو إنستغرام</p>
-              <p className="trust__text">رسالة جاهزة بكل تفاصيل طلبچ</p>
-            </div>
-          </div>
-          <div className="trust__item">
-            <Banknote size={22} aria-hidden="true" />
-            <div>
-              <p className="trust__title">الدفع عند الاستلام</p>
-              <p className="trust__text">بدون دفع إلكتروني أو بطاقات</p>
-            </div>
-          </div>
-          <div className="trust__item">
-            <Truck size={22} aria-hidden="true" />
-            <div>
-              <p className="trust__title">توصيل خلال {siteConfig.deliveryTime}</p>
-              <p className="trust__text">
-                كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)} · باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="container"><DemoNotice /></div>
-
-      {/* 4. الموديلات الجديدة */}
-      <ProductRail
-        eyebrow="من حسابنا"
-        title="أحدث الموديلات"
-        link="/shop"
-        pick={(all) => applyFilters(all, emptyFilters)}
-      />
-
-      {/* 5. الأكثر مبيعاً */}
-      <div className="band">
-        <ProductRail
-          eyebrow="كلما زادت القطع وفّرتي"
-          title="عروض سُدَن"
-          link="/shop?offers=1"
-          pick={(all) => all.filter((p) => p.offer)}
-        />
-      </div>
-
-      {/* 6. التصنيفات */}
-      <section className="section">
-        <div className="container">
-          <SectionHeading eyebrow="تسوّقي حسب" title="النوع، اللون والخامة" />
-
-          <h3 className="subhead">نوع الحجاب</h3>
-          <div className="category-grid">
-            {(Object.keys(categories) as CategoryId[]).map((id) => {
-              const cover = categoryCover(id);
-              return (
-              <Link key={id} to={`/shop?category=${id}`} className="category-tile">
-                {cover && <ProductImage product={cover} />}
-                <span className="category-tile__label">
-                  <strong>{categories[id].label}</strong>
-                  <small>{categories[id].description}</small>
-                </span>
+          <div className="hero__content">
+            <p className="hero__eyebrow">
+              <span lang="en">FOR YOU BY SUDUN</span>
+            </p>
+            <h1 className="hero__title">أناقتچ تبدأ من سُدَن</h1>
+            <p className="hero__text">
+              براند عراقي يقدم حجابات تجمع بين الأناقة، الجودة، والراحة بكل تفاصيلها.
+            </p>
+            <div className="hero__actions">
+              <Link to="/shop" className="btn btn--light btn--lg">
+                تسوّقي الآن
               </Link>
-              );
-            })}
-          </div>
-
-          <div className="split-filters">
-            <div>
-              <h3 className="subhead">حسب اللون</h3>
-              <ul className="color-links">
-                {Object.entries(colorFamilies).map(([id, c]) => (
-                  <li key={id}>
-                    <Link to={`/shop?color=${id}`}>
-                      <span className="swatch-dot swatch-dot--lg" style={{ background: c.swatch }} aria-hidden="true" />
-                      {c.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="subhead">حسب الخامة</h3>
-              <ul className="chip-links">
-                {(Object.keys(materials) as MaterialId[]).map((id) => (
-                  <li key={id}>
-                    <Link to={`/shop?material=${id}`} className="chip">
-                      {materials[id].label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <Link to="/shop?offers=1" className="btn btn--outline-light btn--lg">
+                العروض
+              </Link>
             </div>
           </div>
         </div>
+        <ul className="container hero__facts" aria-label="التوصيل والدفع">
+          <li>
+            <Truck size={18} aria-hidden="true" />
+            <span>
+              <strong>توصيل خلال {siteConfig.deliveryTime}</strong>
+              <small>لجميع محافظات العراق</small>
+            </span>
+          </li>
+          <li>
+            <MapPin size={18} aria-hidden="true" />
+            <span>
+              <strong>كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)}</strong>
+              <small>باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)}</small>
+            </span>
+          </li>
+          <li>
+            <Banknote size={18} aria-hidden="true" />
+            <span>
+              <strong>الدفع عند الاستلام</strong>
+              <small>بدون دفع إلكتروني</small>
+            </span>
+          </li>
+        </ul>
       </section>
 
-      {/* 7. التفاصيل والخامات */}
-      <section className="section quality">
-        <div className="container quality__grid">
-          <div className="quality__photo">
-            <img src="/images/brand/brand-details.webp" alt="الأناقة مو بالملابس الكثيرة، الأناقة بالتفاصيل — سُدَن" loading="lazy" decoding="async" width={1189} height={1420} />
-          </div>
-          <div className="quality__text">
-            <p className="eyebrow">الأناقة بالتفاصيل</p>
-            <h2 className="section-title">وحجابچ هو أول تفصيلة تبرز حضورچ</h2>
-            <p>كل خامة إلها إحساسها. اختاري الخامة اللي تناسبچ:</p>
-            <ul className="quality__list">
-              {(Object.keys(materials) as MaterialId[]).map((id) => (
-                <li key={id}>
-                  <Link to={`/shop?material=${id}`}><strong>{materials[id].label}</strong></Link>
-                  <span>{materials[id].note}</span>
+      {/* 2. التصنيفات بشكل هايلايت إنستغرام */}
+      <nav className="highlights" aria-label="تسوّقي حسب النوع">
+        <ul className="container highlights__list">
+          <li>
+            <Link to="/shop?offers=1" className="highlight highlight--offers">
+              <span className="highlight__ring">
+                <span className="highlight__img highlight__img--mark">
+                  <img src="/brand/star-light.png" alt="" aria-hidden="true" />
+                </span>
+              </span>
+              <span className="highlight__label">العروض</span>
+            </Link>
+          </li>
+          {(Object.keys(categories) as CategoryId[]).map((id) => {
+            const cover = categoryCover(id);
+            return (
+              <li key={id}>
+                <Link to={`/shop?category=${id}`} className="highlight">
+                  <span className="highlight__ring">
+                    <span className="highlight__img">{cover && <ProductImage product={cover} />}</span>
+                  </span>
+                  <span className="highlight__label">{categories[id].label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* 3. أحدث الموديلات */}
+      <section className="section section--tight">
+        <div className="container">
+          <SectionHeading
+            eyebrow="من حسابنا"
+            title="أحدث الموديلات"
+            action={
+              <Link to="/shop" className="link-arrow">
+                كل الحجابات <ArrowLeft size={16} aria-hidden="true" />
+              </Link>
+            }
+          />
+        </div>
+        <div className="container container--bleed">
+          {state.status === 'loading' && <ProductGridSkeleton count={4} />}
+          {state.status === 'error' && <ErrorState onRetry={retry} />}
+          {state.status === 'success' && <ProductGrid products={latest} variant="rail" priorityCount={2} />}
+        </div>
+      </section>
+
+      {/* 4. العروض */}
+      {offers.length > 0 && (
+        <section className="section offers-band">
+          <div className="container">
+            <div className="section-heading section-heading--center">
+              <div>
+                <Ornament />
+                <p className="eyebrow">كلما زادت القطع وفّرتي</p>
+                <h2 className="section-title">عروض سُدَن</h2>
+              </div>
+            </div>
+            <ul className="offer-list">
+              {offers.map((p) => (
+                <li key={p.id}>
+                  <Link to={`/product/${p.slug}`} className="offer-card">
+                    <span className="offer-card__media">
+                      <ProductImage product={p} />
+                    </span>
+                    <span className="offer-card__body">
+                      <span className="offer-card__deal">{offerShort(p)}</span>
+                      <span className="offer-card__name">{p.name}</span>
+                      <span className="offer-card__unit">سعر القطعة {formatIQD(p.price)}</span>
+                      {p.offer?.freeDelivery && <span className="offer-card__tag">+ توصيل مجاني</span>}
+                      <span className="offer-card__cta">
+                        اختاري العرض <ArrowLeft size={15} aria-hidden="true" />
+                      </span>
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
-            <Link to="/shop" className="link-arrow">
-              كل الحجابات <ArrowLeft size={16} aria-hidden="true" />
-            </Link>
+            <p className="offers-band__note">العرض ينحسب تلقائياً بالسلة لما تكمل عدد القطع.</p>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* 8. هوية سُدَن */}
+      {/* 5. هوية سُدَن */}
       <section className="brand-story">
+        <img className="brand-story__pattern" src="/brand/star-light.png" alt="" aria-hidden="true" />
         <div className="container brand-story__inner">
           <img className="brand-story__logo" src="/brand/logo-light.png" alt={`${siteConfig.nameAr} ${siteConfig.nameEn}`} width={751} height={600} loading="lazy" />
           <h2 className="brand-story__title">الحجاب مو بس ستر… هو أسلوب وأناقة</h2>
@@ -227,6 +198,97 @@ export default function HomePage() {
           <Link to="/about" className="btn btn--outline-light">
             تعرّفي على قصتنا
           </Link>
+        </div>
+      </section>
+
+      {/* 6. الخامة واللون */}
+      <section className="section">
+        <div className="container">
+          <SectionHeading eyebrow="الأناقة بالتفاصيل" title="اختاري حسب الخامة واللون" />
+          <div className="refine">
+            <div>
+              <h3 className="subhead">الخامة</h3>
+              <ul className="material-grid">
+                {(Object.keys(materials) as MaterialId[]).map((id) => (
+                  <li key={id}>
+                    <Link to={`/shop?material=${id}`} className="material-tile">
+                      <span>{materials[id].label}</span>
+                      <ArrowLeft size={15} aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="subhead">اللون</h3>
+              <ul className="color-links">
+                {(Object.keys(colorFamilies) as ColorFamily[]).map((id) => (
+                  <li key={id}>
+                    <Link to={`/shop?color=${id}`}>
+                      <span className="swatch-dot swatch-dot--lg" style={{ background: colorFamilies[id].swatch }} aria-hidden="true" />
+                      {colorFamilies[id].label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. طريقة الطلب */}
+      <section className="section how band">
+        <div className="container">
+          <SectionHeading eyebrow="سهلة وسريعة" title="شلون تطلبين؟" center />
+          <ol className="steps">
+            <li className="step">
+              <span className="step__num">١</span>
+              <h3>اختاري حجابچ</h3>
+              <p>أضيفي القطع للسلة، والعروض تنحسب تلقائياً.</p>
+            </li>
+            <li className="step">
+              <span className="step__num">٢</span>
+              <h3>أرسلي الطلب</h3>
+              <p>رسالة واتساب جاهزة بكل التفاصيل، أو راسلينا على إنستغرام.</p>
+            </li>
+            <li className="step">
+              <span className="step__num">٣</span>
+              <h3>استلمي وادفعي</h3>
+              <p>يوصلچ خلال {siteConfig.deliveryTime}، والدفع عند الاستلام.</p>
+            </li>
+          </ol>
+          <div className="how__actions">
+            <Link to="/shop" className="btn btn--dark">ابدئي التسوق</Link>
+            {wa && (
+              <a href={wa} target="_blank" rel="noopener noreferrer" className="btn btn--outline">
+                <WhatsappIcon size={18} /> راسلينا
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. إنستغرام */}
+      <section className="section insta">
+        <div className="container">
+          <SectionHeading
+            eyebrow="تابعي جديدنا"
+            title={siteConfig.instagramHandle ? `\u2066${siteConfig.instagramHandle}\u2069` : 'إنستغرام'}
+            action={
+              siteConfig.instagramUrl ? (
+                <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer" className="link-arrow">
+                  <InstagramIcon size={17} /> زوري الحساب
+                </a>
+              ) : undefined
+            }
+          />
+          <ul className="insta__grid">
+            {instagramPosts.map((post) => (
+              <li key={post.src}>
+                <img src={post.src} alt={post.alt} loading="lazy" decoding="async" width={1189} height={1420} />
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

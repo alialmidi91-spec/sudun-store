@@ -1,5 +1,5 @@
-import { ChevronLeft, ShoppingBag, Truck } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Banknote, ChevronLeft, MapPin, ShoppingBag, Truck } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WhatsappIcon } from '../components/Brand';
 import { ProductGrid } from '../components/ProductCard';
@@ -51,6 +51,21 @@ function ProductDetail({ productId }: { productId: string }) {
   const galleryCount = Math.max(1, images.length);
 
   useEffect(() => setActiveImage(0), [color]);
+
+  // شريط الشراء الثابت بالموبايل: يظهر لما تختفي أزرار الشراء الأصلية من الشاشة
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [showBar, setShowBar] = useState(false);
+  useEffect(() => {
+    const el = actionsRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setShowBar(!entry.isIntersecting && entry.boundingClientRect.top < 0));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    document.body.classList.add('has-buybar');
+    return () => document.body.classList.remove('has-buybar');
+  }, []);
 
   const related = useMemo(
     () =>
@@ -191,7 +206,7 @@ function ProductDetail({ productId }: { productId: string }) {
             </p>
           )}
 
-          <div className="pdp__actions">
+          <div className="pdp__actions" ref={actionsRef}>
             {product.inStock ? (
               <>
                 <button type="button" className="btn btn--dark btn--lg btn--grow" onClick={() => add(false)}>
@@ -206,9 +221,22 @@ function ProductDetail({ productId }: { productId: string }) {
             )}
           </div>
 
-          <p className="pdp__delivery">
-            <Truck size={18} aria-hidden="true" /> توصيل لجميع المحافظات خلال {siteConfig.deliveryTime} · كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)} · باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)} · الدفع عند الاستلام
-          </p>
+          <ul className="pdp__perks">
+            <li>
+              <Truck size={18} aria-hidden="true" />
+              <span>توصيل لجميع المحافظات خلال {siteConfig.deliveryTime}</span>
+            </li>
+            <li>
+              <MapPin size={18} aria-hidden="true" />
+              <span>
+                كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)} · باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)}
+              </span>
+            </li>
+            <li>
+              <Banknote size={18} aria-hidden="true" />
+              <span>الدفع عند الاستلام</span>
+            </li>
+          </ul>
 
           <div className="pdp__details">
             <h2>الوصف</h2>
@@ -231,6 +259,21 @@ function ProductDetail({ productId }: { productId: string }) {
           <DemoNotice compact />
         </div>
       </section>
+
+      {product.inStock && (
+        <div className={`buybar ${showBar ? 'is-visible' : ''}`} aria-hidden={!showBar}>
+          <div className="buybar__info">
+            <span className="buybar__name">{product.name}</span>
+            <span className="buybar__price">{formatIQD(product.price)}</span>
+          </div>
+          <button type="button" className="btn btn--dark buybar__btn" onClick={() => add(false)} tabIndex={showBar ? 0 : -1}>
+            <ShoppingBag size={17} aria-hidden="true" /> أضيفي للسلة
+          </button>
+          <button type="button" className="btn btn--whatsapp buybar__icon" onClick={() => add(true)} aria-label="اطلبي الآن" tabIndex={showBar ? 0 : -1}>
+            <WhatsappIcon size={19} />
+          </button>
+        </div>
+      )}
 
       {related.length > 0 && (
         <section className="section">

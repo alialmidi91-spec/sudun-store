@@ -52,7 +52,7 @@ export function Footer() {
             <li>
               {siteConfig.instagramUrl ? (
                 <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer">
-                  <InstagramIcon size={18} /> {siteConfig.instagramHandle || 'إنستغرام'}
+                  <InstagramIcon size={18} /> <span dir="ltr">{siteConfig.instagramHandle || 'إنستغرام'}</span>
                 </a>
               ) : (
                 <span className="is-pending">

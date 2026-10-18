@@ -28,7 +28,6 @@ export function ProductBadges({ product }: { product: Product }) {
     if (product.isNew) items.push({ label: 'جديد', tone: 'light' });
     if (product.isBestSeller) items.push({ label: 'الأكثر مبيعاً', tone: 'dark' });
     if (hasRealDiscount(product)) items.push({ label: 'تخفيض', tone: 'accent' });
-    if (product.offer) items.push({ label: 'عرض', tone: 'accent' });
   }
   if (!items.length) return null;
   return (

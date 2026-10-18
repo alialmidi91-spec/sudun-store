@@ -199,10 +199,43 @@ export default function ShopPage() {
             </label>
           </div>
 
-          {(filters.onlyNew || filters.onlyBest || filters.onlyOffers) && (
+          <ul className="quick-cats" aria-label="اختصار حسب النوع">
+            <li>
+              <button
+                type="button"
+                className={`chip ${!filters.categories.length && !filters.onlyOffers ? 'chip--active' : ''}`}
+                aria-pressed={!filters.categories.length && !filters.onlyOffers}
+                onClick={() => update({ category: null, offers: null })}
+              >
+                الكل
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                className={`chip ${filters.onlyOffers ? 'chip--active' : ''}`}
+                aria-pressed={filters.onlyOffers}
+                onClick={() => update({ offers: filters.onlyOffers ? null : '1', category: null })}
+              >
+                العروض
+              </button>
+            </li>
+            {(Object.keys(categories) as CategoryId[]).map((id) => {
+              const on = filters.categories.length === 1 && filters.categories[0] === id;
+              return (
+                <li key={id}>
+                  <button type="button" className={`chip ${on ? 'chip--active' : ''}`} aria-pressed={on} onClick={() => update({ category: on ? null : id, offers: null })}>
+                    {categories[id].label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+
+          {(filters.onlyNew || filters.onlyBest) && (
             <div className="active-chips">
-              <button type="button" className="chip chip--active" onClick={() => update({ new: null, best: null, offers: null })}>
-                {filters.onlyOffers ? 'العروض فقط' : filters.onlyNew ? 'الجديد فقط' : 'الأكثر مبيعاً فقط'} <X size={14} aria-hidden="true" />
+              <button type="button" className="chip chip--active" onClick={() => update({ new: null, best: null })}>
+                {filters.onlyNew ? 'الجديد فقط' : 'الأكثر مبيعاً فقط'} <X size={14} aria-hidden="true" />
                 <span className="visually-hidden">إزالة</span>
               </button>
             </div>

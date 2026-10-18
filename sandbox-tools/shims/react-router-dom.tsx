@@ -117,12 +117,13 @@ export function Routes({ children }: { children: ReactNode }) {
   return <>{resolve(children)}</>;
 }
 
-interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'className'> { to: string; end?: boolean; className?: string; replace?: boolean; state?: unknown }
-export function Link({ to, onClick, replace, state, ...rest }: LinkProps) {
+interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'className'> { to: string; end?: boolean; className?: string | ((s: { isActive: boolean }) => string); replace?: boolean; state?: unknown }
+export function Link({ to, onClick, replace, state, className, ...rest }: LinkProps) {
   const navigate = useNavigate();
   return (
     <a
       {...rest}
+      className={typeof className === 'function' ? className({ isActive: false }) : className}
       href={'#' + to}
       onClick={(e: MouseEvent<HTMLAnchorElement>) => {
         onClick?.(e);
@@ -137,5 +138,6 @@ export function NavLink({ to, end, className, ...rest }: LinkProps) {
   const { location } = useRouter();
   const path = to.split('?')[0];
   const active = end ? location.pathname === path : location.pathname === path || location.pathname.startsWith(path + '/');
-  return <Link to={to} {...rest} className={[className, active ? 'active' : ''].filter(Boolean).join(' ')} aria-current={active ? 'page' : undefined} />;
+  const cls = typeof className === 'function' ? className({ isActive: active }) : [className, active ? 'active' : ''].filter(Boolean).join(' ');
+  return <Link to={to} {...rest} className={cls} aria-current={active ? 'page' : undefined} />;
 }

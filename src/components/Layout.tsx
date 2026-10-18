@@ -4,6 +4,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Footer } from './Footer';
 import { Header } from './Header';
+import { MobileNav } from './MobileNav';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -89,6 +90,7 @@ export function Layout() {
         </ErrorBoundary>
       </main>
       <Footer />
+      <MobileNav />
       <CartToast />
     </>
   );
