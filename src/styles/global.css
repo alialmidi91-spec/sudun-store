@@ -1639,9 +1639,11 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .quick-cats li { flex: 0 0 auto; }
 .quick-cats .chip { min-height: 38px; white-space: nowrap; }
 @media (max-width: 899px) {
+  /* أثناء التمرير يبقى سطر «تصفية/ترتيب» فقط تحت الهيدر، وسطر البحث (10+50px) يختفي خلفه.
+     عند التركيز على البحث يرجع الشريط كامل حتى ما ينحجب الحقل. */
   .toolbar {
     position: sticky;
-    top: calc(var(--header-h) + var(--safe-top));
+    top: calc(var(--header-h) + var(--safe-top) - 60px);
     z-index: 20;
     margin-left: calc(var(--pad-l) * -1);
     margin-right: calc(var(--pad-r) * -1);
@@ -1651,5 +1653,35 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
     -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
+  .toolbar:focus-within { top: calc(var(--header-h) + var(--safe-top)); }
   .shop { padding-top: 12px; }
+}
+
+/* ---------- الشاشات القصيرة (موبايل بالوضع الأفقي) ----------
+   ارتفاع الشاشة قليل، فنخلي الثابت بالأعلى هيدر مضغوط فقط (فيه القائمة والبحث والسلة)،
+   ونلغي الشريط السفلي وثبات شريط البحث/التصفية حتى يبقى أغلب الشاشة للمحتوى. */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --header-h: 52px; }
+  .announcement { padding-block: 5px; font-size: 0.74rem; }
+  .announcement { padding-top: calc(5px + var(--safe-top)) !important; }
+  .mobile-nav { display: none !important; }
+  .site-footer__bottom { padding-bottom: calc(18px + var(--safe-bottom)); }
+  .toast-region { bottom: calc(12px + var(--safe-bottom)); }
+  body.has-buybar .site-footer__bottom { padding-bottom: calc(5rem + var(--safe-bottom)); }
+  body.has-buybar .toast-region { bottom: calc(5rem + var(--safe-bottom)); }
+  .logo-img--md { height: 36px; }
+  .toolbar {
+    position: static;
+    margin-inline: 0;
+    padding: 0;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom: 0;
+  }
+  .toolbar__search { flex: 1 1 260px; }
+  .toolbar > .btn, .toolbar__sort { flex: 0 1 auto; }
+  .buybar { padding-block: 6px calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .buybar__btn, .buybar__icon { min-height: 42px; }
+  .buybar__icon { width: 42px; }
 }
