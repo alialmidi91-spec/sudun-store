@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/ui';
 import { siteConfig } from '../config/site';
 import { useSeo } from '../hooks/useSeo';
+import { imageSizes, srcSetFor } from '../lib/images';
 
 /** صفحة "من نحن" — النصوص مأخوذة من حساب سُدَن على إنستغرام */
 export default function AboutPage() {
@@ -12,7 +13,7 @@ export default function AboutPage() {
       <PageHeader eyebrow="من نحن" title="قصة سُدَن" intro={siteConfig.tagline} />
       <section className="container about">
         <div className="about__photo">
-          <img src="/images/brand/brand-about.webp" alt="سُدَن SUDUN — براند عراقي للحجابات" width={1189} height={1420} loading="lazy" decoding="async" />
+          <img src="/images/brand/brand-about.webp" srcSet={srcSetFor('/images/brand/brand-about.webp')} sizes={imageSizes.about} alt="سُدَن SUDUN — براند عراقي للحجابات" width={1189} height={1420} loading="lazy" decoding="async" />
         </div>
         <div className="prose">
           <h2>مو مجرد حجاب</h2>

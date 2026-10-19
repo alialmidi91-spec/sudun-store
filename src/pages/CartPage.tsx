@@ -14,6 +14,7 @@ import { normalizeIraqiPhone } from '../lib/phone';
 import { readStorage, writeStorage } from '../lib/storage';
 import { buildOrderMessage, buildWhatsappUrl } from '../lib/whatsapp';
 import { FabricArt } from '../components/FabricArt';
+import { imageSizes, srcSetFor } from '../lib/images';
 import type { CustomerInfo } from '../types';
 
 const CUSTOMER_KEY = 'sadan.customer.v1';
@@ -163,7 +164,7 @@ export default function CartPage() {
                 <li key={line.key} className="cart-line">
                   <Link to={`/product/${line.slug}`} className="cart-line__media" tabIndex={-1} aria-hidden="true">
                     {product?.images[0] ? (
-                      <img src={product.images[0]} alt="" loading="lazy" width={160} height={200} />
+                      <img src={product.images[0]} srcSet={srcSetFor(product.images[0])} sizes={imageSizes.cartLine} alt="" loading="lazy" width={160} height={200} />
                     ) : (
                       <FabricArt color={line.colorHex ?? '#E7DCCB'} seed={line.productId} />
                     )}

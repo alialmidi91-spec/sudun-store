@@ -87,8 +87,11 @@ function checks({ cfgW, dpr }) {
     if (!vis(img) || !img.naturalWidth) continue;
     const r = img.getBoundingClientRect();
     const need = r.width * dpr;
-    const ratio = img.naturalWidth / need;
-    if (ratio > 2.5) out.images.push(`أكبر من الحاجة ×${ratio.toFixed(1)}: ${img.getAttribute('src')} (يُعرض ${Math.round(r.width)}px)`);
+    // عرض الملف المحمّل فعلياً: مع srcset يصير naturalWidth مُعدَّلاً بالكثافة، فنقرأ العرض من اسم النسخة (-400/-640/-900)
+    const variantW = (img.currentSrc || '').match(/-(\d+)\.webp$/);
+    const fileW = variantW ? +variantW[1] : img.srcset ? 1189 : img.naturalWidth;
+    const ratio = fileW / need;
+    if (ratio > 2.5) out.images.push(`أكبر من الحاجة ×${ratio.toFixed(1)}: ${(img.currentSrc ? new URL(img.currentSrc).pathname : img.getAttribute('src'))} (يُعرض ${Math.round(r.width)}px)`);
     if (ratio < 0.9 && r.width > 120) out.images.push(`أصغر من الحاجة (قد تظهر مشوشة) ×${ratio.toFixed(2)}: ${img.getAttribute('src')} (يُعرض ${Math.round(r.width)}px @${dpr}x)`);
   }
   // 4) محاذاة RTL: نصوص عربية بمحاذاة يسار فيزيائية أو اتجاه ltr غير مقصود

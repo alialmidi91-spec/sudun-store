@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { InstagramIcon, WhatsappIcon } from '../components/Brand';
 import { offerShort, ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
 import { ProductImage } from '../components/ProductImage';
+import { imageSizes, srcSetFor } from '../lib/images';
 import { Accordion, ErrorState, SectionHeading } from '../components/ui';
 import { siteConfig } from '../config/site';
 import { faqs } from '../data/faqs';
@@ -49,12 +50,12 @@ export default function HomePage() {
           <div className="hero__visual">
             {HERO_MAIN && (
               <Link to={`/product/${HERO_MAIN.slug}`} className="hero__arch" aria-label={HERO_MAIN.name}>
-                <ProductImage product={HERO_MAIN} priority />
+                <ProductImage product={HERO_MAIN} priority sizes={imageSizes.heroMain} />
               </Link>
             )}
             {HERO_SMALL && (
               <Link to={`/product/${HERO_SMALL.slug}`} className="hero__arch hero__arch--small" aria-label={HERO_SMALL.name}>
-                <ProductImage product={HERO_SMALL} />
+                <ProductImage product={HERO_SMALL} sizes={imageSizes.heroSmall} />
               </Link>
             )}
           </div>
@@ -120,7 +121,7 @@ export default function HomePage() {
               <li key={id}>
                 <Link to={`/shop?category=${id}`} className="highlight">
                   <span className="highlight__ring">
-                    <span className="highlight__img">{cover && <ProductImage product={cover} />}</span>
+                    <span className="highlight__img">{cover && <ProductImage product={cover} sizes={imageSizes.circle} />}</span>
                   </span>
                   <span className="highlight__label">{categories[id].label}</span>
                 </Link>
@@ -166,7 +167,7 @@ export default function HomePage() {
                 <li key={p.id}>
                   <Link to={`/product/${p.slug}`} className="offer-card">
                     <span className="offer-card__media">
-                      <ProductImage product={p} />
+                      <ProductImage product={p} sizes={imageSizes.offer} />
                     </span>
                     <span className="offer-card__body">
                       <span className="offer-card__deal">{offerShort(p)}</span>
@@ -285,7 +286,7 @@ export default function HomePage() {
           <ul className="insta__grid">
             {instagramPosts.map((post) => (
               <li key={post.src}>
-                <img src={post.src} alt={post.alt} loading="lazy" decoding="async" width={1189} height={1420} />
+                <img src={post.src} srcSet={srcSetFor(post.src)} sizes={imageSizes.insta} alt={post.alt} loading="lazy" decoding="async" width={1189} height={1420} />
               </li>
             ))}
           </ul>

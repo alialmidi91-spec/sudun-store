@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WhatsappIcon } from '../components/Brand';
 import { ProductGrid } from '../components/ProductCard';
 import { ProductImage } from '../components/ProductImage';
+import { imageSizes } from '../lib/images';
 import { DemoNotice, ErrorState, Price, ProductBadges, QuantityStepper, SectionHeading } from '../components/ui';
 import { PageLoader } from '../components/Layout';
 import { siteConfig } from '../config/site';
@@ -131,7 +132,7 @@ function ProductDetail({ productId }: { productId: string }) {
       <section className="container pdp">
         <div className="pdp__gallery">
           <div className="pdp__main-image">
-            <ProductImage product={product} colorName={color} index={activeImage} priority />
+            <ProductImage product={product} colorName={color} index={activeImage} priority sizes={imageSizes.pdp} />
             <ProductBadges product={product} />
           </div>
           {galleryCount > 1 && (
@@ -146,7 +147,7 @@ function ProductDetail({ productId }: { productId: string }) {
                   className={`pdp__thumb ${i === activeImage ? 'is-active' : ''}`}
                   onClick={() => setActiveImage(i)}
                 >
-                  <ProductImage product={product} colorName={color} index={i} />
+                  <ProductImage product={product} colorName={color} index={i} sizes={imageSizes.thumb} />
                 </button>
               ))}
             </div>

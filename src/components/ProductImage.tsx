@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { imageSizes, srcSetFor } from '../lib/images';
 import type { Product } from '../types';
 import { FabricArt } from './FabricArt';
 
@@ -9,13 +10,15 @@ interface Props {
   index?: number;
   priority?: boolean;
   className?: string;
+  /** عرض الصورة الفعلي بالتصميم (لـ sizes) حتى يختار المتصفح النسخة المناسبة؛ الافتراضي بطاقة المنتج */
+  sizes?: string;
 }
 
 /**
  * يعرض صورة المنتج الحقيقية إن وُجدت (مع تحميل كسول)،
  * وإلا يعرض رسماً توضيحياً بلون المنتج مع إشارة "صورة توضيحية".
  */
-export function ProductImage({ product, colorName, index = 0, priority = false, className = '' }: Props) {
+export function ProductImage({ product, colorName, index = 0, priority = false, className = '', sizes = imageSizes.card }: Props) {
   const color = product.colors.find((c) => c.name === colorName) ?? product.colors[0];
   const sources = color?.images?.length ? color.images : product.images;
   const src = sources[index] ?? sources[0];
@@ -26,6 +29,8 @@ export function ProductImage({ product, colorName, index = 0, priority = false, 
       <img
         className={`product-image ${className}`}
         src={src}
+        srcSet={srcSetFor(src)}
+        sizes={srcSetFor(src) ? sizes : undefined}
         alt={`${product.name}${color ? ` — ${color.name}` : ''}`}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"

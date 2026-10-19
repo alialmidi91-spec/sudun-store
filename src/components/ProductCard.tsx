@@ -6,6 +6,7 @@ import { categories, materialLabel } from '../data/taxonomy';
 import { formatIQD, piecesLabel } from '../lib/format';
 import type { Product } from '../types';
 import { ProductImage } from './ProductImage';
+import { imageSizes } from '../lib/images';
 import { Price, ProductBadges } from './ui';
 
 /** نص العرض المختصر: "3 قطع بـ 25,000" */
@@ -14,7 +15,7 @@ export function offerShort(p: Product): string | null {
   return `${piecesLabel(p.offer.quantity)} بـ ${formatIQD(p.offer.price)}`;
 }
 
-export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
+export function ProductCard({ product, priority = false, sizes }: { product: Product; priority?: boolean; sizes?: string }) {
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [added, setAdded] = useState(false);
@@ -47,7 +48,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   return (
     <article className={`card ${product.inStock ? '' : 'card--soldout'}`}>
       <Link to={url} className="card__media" tabIndex={-1} aria-hidden="true">
-        <ProductImage product={product} priority={priority} />
+        <ProductImage product={product} priority={priority} sizes={sizes} />
         <ProductBadges product={product} />
         {offer && (
           <span className="card__ribbon">
@@ -119,7 +120,7 @@ export function ProductGrid({
   return (
     <div className={variant === 'rail' ? 'grid grid--rail' : 'grid'}>
       {products.map((p, i) => (
-        <ProductCard key={p.id} product={p} priority={i < priorityCount} />
+        <ProductCard key={p.id} product={p} priority={i < priorityCount} sizes={variant === 'rail' ? imageSizes.rail : imageSizes.card} />
       ))}
     </div>
   );
