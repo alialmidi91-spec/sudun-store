@@ -50,7 +50,8 @@ function checks({ cfgW, dpr }) {
 
   // 1) تداخل العناصر: أزرار/روابط/عناوين/أسعار تتقاطع مع بعض (باستثناء العناصر المتداخلة عمداً فوق الصور)
   const sel = 'main a[href], main button, main h1, main h2, main h3, main .price, main input, main select, main textarea, main label, footer a, header a, header button';
-  const els = [...document.querySelectorAll(sel)].filter(vis).filter((e) => !e.closest('.card__media, .hero__visual, .pdp__main-image, .offer-card__media, .highlight__ring, .grid--rail, .quick-cats, .highlights__list'));
+  const els = [...document.querySelectorAll(sel)].filter(vis).filter((e) => !e.closest('.buybar')) // الشريط الثابت يمر فوق المحتوى عمداً؛ مساحته تُقاس بقسم الأشرطة الثابتة
+    .filter((e) => !e.closest('.card__media, .hero__visual, .pdp__main-image, .offer-card__media, .highlight__ring, .grid--rail, .quick-cats, .highlights__list'));
   // عنصر مخفي داخل حاوية تمرير خاصة به (مثل قائمة التصفية الجانبية) لا يُعتبر متداخلاً
   const clippedOut = (e) => {
     const r = e.getBoundingClientRect();

@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
 import { siteConfig } from '../config/site';
 
+/** عرض الشعار المعروض فعلياً (الارتفاع بـ global.css × نسبة الشعار 390:160) */
+const LOGO_SIZES = { sm: '83px', md: '(min-width: 768px) 112px, 98px', lg: '156px' } as const;
+
 /**
  * شعار سُدَن الأصلي (من ملفات المتجر في public/brand/)
  * tone="dark" للخلفيات الفاتحة، tone="light" للخلفيات الداكنة.
@@ -10,6 +13,9 @@ export function Logo({ size = 'md', asLink = true, tone = 'dark' }: { size?: 'sm
     <img
       className={`logo-img logo-img--${size}`}
       src={`/brand/wordmark-${tone}.png`}
+      // نسخة بدقة مضاعفة من نفس الشعار للشاشات عالية الكثافة (الحجم الكبير بالتذييل)
+      srcSet={`/brand/wordmark-${tone}.png 390w, /brand/wordmark-${tone}-2x.png 780w`}
+      sizes={LOGO_SIZES[size]}
       alt={`${siteConfig.nameAr} ${siteConfig.nameEn}`}
       width={390}
       height={160}
