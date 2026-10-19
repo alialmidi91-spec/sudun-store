@@ -1,5 +1,5 @@
-import { SearchX, SlidersHorizontal, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { ChevronDown, SearchX, SlidersHorizontal, X } from 'lucide-react';
+import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
 import { DemoNotice, EmptyState, ErrorState, PageHeader } from '../components/ui';
@@ -50,6 +50,38 @@ function useCatalogParams() {
   return { filters, update, toggle, reset, clearAll };
 }
 
+/**
+ * مجموعة تصفية قابلة للطي: العنوان زر (aria-expanded) يفتح ويسد المحتوى باللمس أو الماوس أو Enter/Space.
+ * تنفتح تلقائياً إذا بيها اختيار فعّال، وتعرض عدد الاختيارات حتى لو كانت مسدودة.
+ */
+function FilterGroup({ title, count, defaultOpen = false, children }: { title: string; count: number; defaultOpen?: boolean; children: ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen || count > 0);
+  const hasActive = count > 0;
+  useEffect(() => {
+    if (hasActive) setOpen(true);
+  }, [hasActive]);
+  const bodyId = useId();
+  return (
+    <fieldset className={`filters__group ${open ? 'is-open' : ''}`}>
+      <legend className="filters__legend">
+        <button type="button" className="filters__toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => setOpen((v) => !v)}>
+          <span className="filters__title">{title}</span>
+          {hasActive && (
+            <span className="filters__count">
+              {count}
+              <span className="visually-hidden"> {count === 1 ? 'اختيار' : 'اختيارات'}</span>
+            </span>
+          )}
+          <ChevronDown size={18} aria-hidden="true" className="filters__chevron" />
+        </button>
+      </legend>
+      <div id={bodyId} className="filters__body" hidden={!open}>
+        {children}
+      </div>
+    </fieldset>
+  );
+}
+
 export default function ShopPage() {
   const { filters, update, toggle, reset, clearAll } = useCatalogParams();
   const { state, retry } = useAsync(fetchProducts);
@@ -95,18 +127,16 @@ export default function ShopPage() {
 
   const panel = (
     <div className="filters">
-      <fieldset className="filters__group">
-        <legend>نوع الحجاب</legend>
+      <FilterGroup title="نوع الحجاب" count={filters.categories.length} defaultOpen>
         {(Object.keys(categories) as CategoryId[]).map((id) => (
           <label key={id} className="check">
             <input type="checkbox" checked={filters.categories.includes(id)} onChange={() => toggle('category', filters.categories, id)} />
             <span>{categories[id].label}</span>
           </label>
         ))}
-      </fieldset>
+      </FilterGroup>
 
-      <fieldset className="filters__group">
-        <legend>اللون</legend>
+      <FilterGroup title="اللون" count={filters.colors.length} defaultOpen>
         <div className="filters__swatches">
           {(Object.keys(colorFamilies) as ColorFamily[]).map((id) => (
             <label key={id} className="swatch-check" title={colorFamilies[id].label}>
@@ -116,20 +146,18 @@ export default function ShopPage() {
             </label>
           ))}
         </div>
-      </fieldset>
+      </FilterGroup>
 
-      <fieldset className="filters__group">
-        <legend>الخامة</legend>
+      <FilterGroup title="الخامة" count={filters.materials.length}>
         {(Object.keys(materials) as MaterialId[]).map((id) => (
           <label key={id} className="check">
             <input type="checkbox" checked={filters.materials.includes(id)} onChange={() => toggle('material', filters.materials, id)} />
             <span>{materials[id].label}</span>
           </label>
         ))}
-      </fieldset>
+      </FilterGroup>
 
-      <fieldset className="filters__group">
-        <legend>السعر (د.ع)</legend>
+      <FilterGroup title="السعر (د.ع)" count={filters.price ? 1 : 0}>
         <label className="check">
           <input type="radio" name="price" checked={!filters.price} onChange={() => update({ price: null })} />
           <span>كل الأسعار</span>
@@ -140,15 +168,14 @@ export default function ShopPage() {
             <span>{r.label}</span>
           </label>
         ))}
-      </fieldset>
+      </FilterGroup>
 
-      <fieldset className="filters__group">
-        <legend>التوفر</legend>
+      <FilterGroup title="التوفر" count={filters.inStockOnly ? 1 : 0}>
         <label className="check">
           <input type="checkbox" checked={filters.inStockOnly} onChange={() => update({ stock: filters.inStockOnly ? null : '1' })} />
           <span>المتوفر فقط</span>
         </label>
-      </fieldset>
+      </FilterGroup>
     </div>
   );
 

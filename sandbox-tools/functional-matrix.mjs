@@ -76,13 +76,28 @@ for (const vp of VIEWPORTS.filter((v) => !only.length || only.includes(v.w))) {
     if (await isVis('.toolbar button:has-text("تصفية")')) {
       await tap('.toolbar button:has-text("تصفية")');
       if (!(await isVis('.sheet'))) return 'لوحة التصفية ما انفتحت';
+      // مجموعة «الخامة» مطوية افتراضياً: نفتحها أولاً ونتأكد من aria-expanded
+      const t = p.locator('.sheet .filters__toggle:has-text("الخامة")');
+      if ((await t.getAttribute('aria-expanded')) !== 'false') return 'مجموعة الخامة لازم تكون مطوية بالبداية';
+      await t.click();
+      if ((await t.getAttribute('aria-expanded')) !== 'true') return 'مجموعة الخامة ما انفتحت';
       await tap('.sheet label:has-text("قطن")');
       await tap('.sheet__foot .btn--dark');
     } else {
+      const t = p.locator('.shop__sidebar .filters__toggle:has-text("الخامة")');
+      if ((await t.getAttribute('aria-expanded')) !== 'false') return 'مجموعة الخامة لازم تكون مطوية بالبداية';
+      await t.focus(); await p.keyboard.press('Enter'); // لوحة المفاتيح
+      if ((await t.getAttribute('aria-expanded')) !== 'true') return 'مجموعة الخامة ما انفتحت باللوحة';
       await tap('.shop__sidebar label:has-text("قطن")');
     }
     await p.waitForTimeout(250);
-    return ((await count()) === '1 منتج' && p.url().includes('material=cotton')) || `${await count()} ${p.url()}`;
+    if (!((await count()) === '1 منتج' && p.url().includes('material=cotton'))) return `${await count()} ${p.url()}`;
+    // بعد إعادة التحميل: المجموعة الفعّالة تبقى مفتوحة وتعرض العدد
+    await p.reload(); await p.locator('main h1').first().waitFor();
+    if (await isVis('.toolbar button:has-text("تصفية")')) await tap('.toolbar button:has-text("تصفية")');
+    const scope = (await isVis('.sheet')) ? '.sheet' : '.shop__sidebar';
+    const t2 = p.locator(`${scope} .filters__toggle:has-text("الخامة")`);
+    return ((await t2.getAttribute('aria-expanded')) === 'true' && ((await t2.locator('.filters__count').textContent()) ?? '').startsWith('1')) || 'المجموعة الفعّالة ما بقت مفتوحة';
   });
 
   await check('الترتيب حسب السعر', async () => {
