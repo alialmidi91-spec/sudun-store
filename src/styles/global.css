@@ -1255,9 +1255,10 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 @media (min-width: 900px) { .pdp { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 64px; } }
 .pdp__gallery { display: grid; gap: 10px; }
 @media (min-width: 768px) { .pdp__gallery { position: sticky; top: calc(var(--header-h) + 16px + var(--safe-top)); } }
+/* نسبة 15:16 قريبة من نسبة صور سدن الأصلية (≈1189×1270) حتى تبين الصورة كاملة تقريباً بدون قص الأطراف */
 .pdp__main-image {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 15 / 16;
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--beige-soft);
@@ -1600,7 +1601,8 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 }
 /* الشريط السفلي للموبايل فقط (أقل من 600px)، والتابلت يستخدم قائمة الهيدر */
 @media (min-width: 600px) { .mobile-nav { display: none !important; } }
-@media (min-width: 900px) { .buybar { display: none !important; } }
+/* الحاسوب: بدون شريط شراء. الهاتف الكبير بالوضع الأفقي (عرض 900+ وارتفاع قليل) يحتاجه */
+@media (min-width: 900px) and (min-height: 501px) { .buybar { display: none !important; } }
 
 /* ---------- Sticky buy bar (product page, mobile) ---------- */
 .buybar {
@@ -1684,4 +1686,30 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
   .buybar { padding-block: 6px calc(6px + env(safe-area-inset-bottom, 0px)); }
   .buybar__btn, .buybar__icon { min-height: 42px; }
   .buybar__icon { width: 42px; }
+}
+
+/* ---------- صفحة المنتج: السعر والأزرار أقرب لأول شاشة ----------
+   الصورة تحافظ على نسبتها، لكن عرضها يتقيّد بارتفاع الشاشة
+   حتى يبين الاسم والسعر تحتها. الهامش السالب (عرض كامل) يبقى بالموبايل العادي. */
+@media (max-width: 899px) {
+  .pdp__main-image {
+    --pdp-img-w: calc(56vh * 0.9375);
+    --pdp-img-w: calc(56svh * 0.9375);
+    margin-inline: max(calc(var(--gutter) * -1), calc((100% - var(--pdp-img-w)) / 2));
+  }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .pdp__main-image { margin-inline: max(0px, calc((100% - var(--pdp-img-w)) / 2)); }
+}
+/* موبايل أفقي: عمودين (الصورة + المعلومات) والصورة بارتفاع الشاشة المتاح */
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .pdp { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .pdp__gallery { position: sticky; top: calc(var(--header-h) + 12px + var(--safe-top)); }
+  .pdp__main-image {
+    --pdp-img-w: calc((100vh - var(--header-h) - 28px) * 0.9375);
+    --pdp-img-w: calc((100svh - var(--header-h) - 28px) * 0.9375);
+    margin-inline: max(0px, calc((100% - var(--pdp-img-w)) / 2));
+  }
+  .pdp__title { font-size: 1.7rem; }
+  .breadcrumbs { padding-block: 2px; }
 }

@@ -52,7 +52,8 @@ function ProductDetail({ productId }: { productId: string }) {
 
   useEffect(() => setActiveImage(0), [color]);
 
-  // شريط الشراء الثابت بالموبايل: يظهر لما تختفي أزرار الشراء الأصلية من الشاشة
+  // شريط الشراء الثابت (أقل من 900px): يظهر ما دامت أزرار الشراء الأصلية خارج الشاشة —
+  // سواء ما وصلتلها الزبونة بعد (تحت الشاشة) أو تجاوزتها (فوق الشاشة)، ويختفي لما تبين الأزرار نفسها
   const actionsRef = useRef<HTMLDivElement>(null);
   const [showBar, setShowBar] = useState(false);
   useEffect(() => {
@@ -62,7 +63,10 @@ function ProductDetail({ productId }: { productId: string }) {
     const update = () => {
       frame = 0;
       const el = actionsRef.current;
-      if (el) setShowBar(el.getBoundingClientRect().bottom < 0);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      // 72px تقريباً ارتفاع الشريط نفسه: إذا الأزرار مخفية تحته نعتبرها غير ظاهرة
+      setShowBar(r.bottom < 0 || r.top > window.innerHeight - 72);
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
