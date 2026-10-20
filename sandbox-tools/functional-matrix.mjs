@@ -2,7 +2,7 @@
 import { chromium } from '/home/claude/.npm-global/lib/node_modules/playwright/index.mjs';
 import { VIEWPORTS } from './responsive-audit.mjs';
 
-const BASE = 'http://localhost:4173/#/';
+const BASE = process.env.BASE || 'http://localhost:4173/#/';
 const only = process.argv.slice(2).map(Number).filter(Boolean);
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 const table = [];

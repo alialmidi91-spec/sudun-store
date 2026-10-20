@@ -6,13 +6,36 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# معاينات الفروع وطلبات الدمج: فحص TypeScript كامل قبل البناء (الإنتاج يبقى بنفس أمر البناء الحالي)
+[context.deploy-preview]
+  command = "npm run build:check"
+
+[context.branch-deploy]
+  command = "npm run build:check"
+
 # كل الصفحات (مثل /shop و /product/...) تفتح من index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
+# لوحة التحكم: بدون أرشفة وبدون فتحها داخل مواقع ثانية
+[[headers]]
+  for = "/admin"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "same-origin"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "same-origin"
+
 # تخزين مؤقت طويل للملفات الثابتة لتسريع الموقع
+
 [[headers]]
   for = "/assets/*"
   [headers.values]
