@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/ui';
 import { siteConfig } from '../config/site';
-import { products } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
 import { useSeo } from '../hooks/useSeo';
 import { formatIQD } from '../lib/format';
 
@@ -9,6 +9,7 @@ import { formatIQD } from '../lib/format';
 export default function DeliveryPage() {
   useSeo({ title: 'التوصيل والدفع', description: 'توصيل لجميع محافظات العراق خلال 24 ساعة، والدفع عند الاستلام.' });
   const special = Object.entries(siteConfig.deliveryFees).filter(([, v]) => typeof v === 'number') as [string, number][];
+  const { products } = useCatalog();
   const offers = products.filter((p) => p.offer);
 
   return (

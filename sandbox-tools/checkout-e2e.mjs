@@ -1,6 +1,6 @@
 // Sandbox-only: end-to-end checkout scenarios in a phone-sized browser.
 import { chromium } from '/home/claude/.npm-global/lib/node_modules/playwright/index.mjs';
-const BASE = 'http://localhost:4173/#/';
+const BASE = process.env.BASE || 'http://localhost:4173/#/';
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 const ctx = await b.newContext({ viewport: { width: 384, height: 832 }, isMobile: true, hasTouch: true });
 const p = await ctx.newPage();

@@ -7,7 +7,8 @@ import { imageSizes, srcSetFor } from '../lib/images';
 import { Accordion, ErrorState, SectionHeading } from '../components/ui';
 import { siteConfig } from '../config/site';
 import { faqs } from '../data/faqs';
-import { products } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
+import type { Product } from '../types';
 import { categories, colorFamilies, materials } from '../data/taxonomy';
 import { useAsync } from '../hooks/useAsync';
 import { useSeo } from '../hooks/useSeo';
@@ -17,11 +18,10 @@ import { storeChatUrl } from '../lib/whatsapp';
 import type { CategoryId, ColorFamily, MaterialId } from '../types';
 
 /** أول منتج من كل نوع يُستخدم كصورة للتصنيف */
-const categoryCover = (id: CategoryId) => products.find((p) => p.category === id && p.images.length);
-const productBySlug = (slug: string) => products.find((p) => p.slug === slug);
-/** صور الواجهة الرئيسية — غيّري الـ slug لتبديل الصورة */
-const HERO_MAIN = productBySlug('silk-lebanese-floral');
-const HERO_SMALL = productBySlug('georgette-ninja-shawl');
+const categoryCover = (products: Product[], id: CategoryId) => products.find((p) => p.category === id && p.images.length);
+const productBySlug = (products: Product[], slug: string) => products.find((p) => p.slug === slug);
+/** صور الواجهة الرئيسية — غيّري الـ slug لتبديل الصورة (إذا المنتج مخفي تُستخدم أول صور منشورة) */
+const HERO_SLUGS = ['silk-lebanese-floral', 'georgette-ninja-shawl'];
 
 /** صور منشورات البراند على إنستغرام */
 const instagramPosts = [
@@ -38,6 +38,10 @@ export default function HomePage() {
   useSeo({});
   const { state, retry } = useAsync(fetchProducts);
   const latest = state.status === 'success' ? applyFilters(state.data, emptyFilters) : [];
+  const { products } = useCatalog();
+  const withImages = products.filter((p) => p.images.length);
+  const HERO_MAIN = productBySlug(products, HERO_SLUGS[0]) ?? withImages[0];
+  const HERO_SMALL = productBySlug(products, HERO_SLUGS[1]) ?? withImages.find((p) => p !== HERO_MAIN);
   const offers = products.filter((p) => p.offer);
   const wa = storeChatUrl();
 
@@ -116,7 +120,7 @@ export default function HomePage() {
             </Link>
           </li>
           {(Object.keys(categories) as CategoryId[]).map((id) => {
-            const cover = categoryCover(id);
+            const cover = categoryCover(products, id);
             return (
               <li key={id}>
                 <Link to={`/shop?category=${id}`} className="highlight">
