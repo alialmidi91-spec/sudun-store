@@ -3,12 +3,10 @@ import { PageHeader } from '../components/ui';
 import { siteConfig } from '../config/site';
 import { useCatalog } from '../hooks/useCatalog';
 import { useSeo } from '../hooks/useSeo';
-import { formatIQD } from '../lib/format';
 
 /** سياسة التوصيل — حسب المعلومات التي أكدها المتجر */
 export default function DeliveryPage() {
   useSeo({ title: 'التوصيل والدفع', description: 'توصيل لجميع محافظات العراق خلال 24 ساعة، والدفع عند الاستلام.' });
-  const special = Object.entries(siteConfig.deliveryFees).filter(([, v]) => typeof v === 'number') as [string, number][];
   const { products } = useCatalog();
   const offers = products.filter((p) => p.offer);
 
@@ -20,17 +18,7 @@ export default function DeliveryPage() {
         <p>نوصّل لجميع محافظات العراق، ومدة التوصيل {siteConfig.deliveryTime}.</p>
 
         <h2>أجور التوصيل</h2>
-        <div className="table-wrap">
-          <table className="table">
-            <thead><tr><th>المحافظة</th><th>الأجور</th></tr></thead>
-            <tbody>
-              {special.map(([g, f]) => <tr key={g}><td>{g}</td><td>{formatIQD(f)}</td></tr>)}
-              {siteConfig.defaultDeliveryFee !== null && (
-                <tr><td>باقي المحافظات</td><td>{formatIQD(siteConfig.defaultDeliveryFee)}</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <p><strong>التوصيل لجميع المحافظات بسعر 5,000 دينار.</strong></p>
 
         {offers.length > 0 && (
           <>
