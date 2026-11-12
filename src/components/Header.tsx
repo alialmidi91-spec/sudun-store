@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { siteConfig } from '../config/site';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
 import { matchesQuery } from '../lib/catalog';
 import { formatIQD } from '../lib/format';
 import { InstagramIcon, Logo, WhatsappIcon } from './Brand';
@@ -89,7 +89,8 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
   const [q, setQ] = useState('');
   const navigate = useNavigate();
   const ref = useDialog(true, onClose);
-  const results = useMemo(() => (q.trim() ? products.filter((p) => matchesQuery(p, q)).slice(0, 5) : []), [q]);
+  const { products } = useCatalog();
+  const results = useMemo(() => (q.trim() ? products.filter((p) => matchesQuery(p, q)).slice(0, 5) : []), [q, products]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();

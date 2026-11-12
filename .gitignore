@@ -3,3 +3,7 @@ dist
 .sandbox-build
 *.log
 .DS_Store
+.sandbox-build-sb
+.env
+.env.local
+.env.*.local

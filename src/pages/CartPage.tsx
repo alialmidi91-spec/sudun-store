@@ -2,10 +2,11 @@ import { AlertTriangle, CheckCircle2, ShoppingBag, Trash2 } from 'lucide-react';
 import { cloneElement, useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { WhatsappIcon } from '../components/Brand';
-import { EmptyState, PageHeader, QuantityStepper } from '../components/ui';
+import { EmptyState, ErrorState, PageHeader, QuantityStepper } from '../components/ui';
 import { getDeliveryFee, isWhatsappConfigured, siteConfig } from '../config/site';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
+import { PageLoader } from '../components/Layout';
 import { governorates } from '../data/taxonomy';
 import { useSeo } from '../hooks/useSeo';
 import { cartCount, lineTotal, priceOrder } from '../lib/cart-math';
@@ -52,7 +53,8 @@ export default function CartPage() {
   }, [customer]);
 
   const deliveryFee = customer.governorate ? getDeliveryFee(customer.governorate) : null;
-  const thumbs = useMemo(() => new Map(products.map((p) => [p.id, p])), []);
+  const catalog = useCatalog();
+  const thumbs = useMemo(() => new Map(catalog.products.map((p) => [p.id, p])), [catalog.products]);
   const totals = priceOrder(lines, (id) => thumbs.get(id)?.offer, deliveryFee, siteConfig.defaultDeliveryFee);
   const pieces = cartCount(lines);
   // تلميح: كم قطعة تبقّت لاكتمال العرض
@@ -90,6 +92,17 @@ export default function CartPage() {
     window.open(buildWhatsappUrl(orderMessage()), '_blank', 'noopener,noreferrer');
     setSent(true);
   };
+
+  // الأسعار والعروض تعتمد على الكتالوج: ما نعرض المجموع قبل ما يتحمّل
+  if (lines.length && !sent && catalog.status !== 'ready') {
+    return catalog.status === 'error' ? (
+      <div className="container section">
+        <ErrorState message="تعذّر تحميل أسعار المنتجات. تأكدي من الإنترنت وحاولي مرة ثانية." onRetry={catalog.retry} />
+      </div>
+    ) : (
+      <PageLoader />
+    );
+  }
 
   if (!lines.length && !sent) {
     return (

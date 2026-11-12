@@ -46,7 +46,7 @@ export function ProductImage({ product, colorName, index = 0, priority = false, 
       <FabricArt
         color={color?.hex ?? '#E7DCCB'}
         seed={product.id + index}
-        sheen={product.material === 'satin'}
+        sheen={product.material === 'silk-lebanese'}
         title={`${product.name}${color ? ` — ${color.name}` : ''} (صورة توضيحية)`}
       />
       <span className="product-image__tag">صورة توضيحية</span>

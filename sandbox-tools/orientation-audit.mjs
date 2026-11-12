@@ -3,7 +3,7 @@
 import { chromium } from '/home/claude/.npm-global/lib/node_modules/playwright/index.mjs';
 import { writeFileSync } from 'node:fs';
 
-const BASE = 'http://localhost:4173/#/';
+const BASE = process.env.BASE || 'http://localhost:4173/#/';
 const OUT = process.argv[2] || '/tmp/orientation-audit.json';
 const VPS = [
   // هواتف أفقي

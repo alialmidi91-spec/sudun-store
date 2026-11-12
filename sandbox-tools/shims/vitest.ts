@@ -12,6 +12,7 @@ export function expect(actual: any) {
     toBe: (e: unknown) => Object.is(actual, e) || fail(`expected ${JSON.stringify(actual)} to be ${JSON.stringify(e)}`),
     toEqual: (e: unknown) => eq(actual, e) || fail(`expected ${JSON.stringify(actual)} to equal ${JSON.stringify(e)}`),
     toContain: (e: string) => actual.includes(e) || fail(`expected text to contain «${e}»`),
+    toBeTruthy: () => !!actual || fail(`expected ${JSON.stringify(actual)} to be truthy`),
     toBeGreaterThan: (e: number) => actual > e || fail(`expected ${actual} > ${e}`),
     not: { toContain: (e: string) => !actual.includes(e) || fail(`expected text NOT to contain «${e}»`) },
   };

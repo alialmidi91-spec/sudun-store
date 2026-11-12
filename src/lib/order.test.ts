@@ -63,8 +63,7 @@ const L = (productId: string, qty: number, color = 'x'): CartLine => {
 };
 // sd-001 حرير 12,000 (قطعتين 24,000 + توصيل مجاني) · sd-002 شيفون 8,000 (3 بـ 25,000 + توصيل مجاني)
 // sd-004 نينجا 9,000 (3 بـ 25,000 + توصيل مجاني) · sd-003 جرجيت 10,000 (بدون عرض)
-const KARBALA = 3000;
-const OTHER = 5000;
+const DELIVERY_FEE = 5000;
 
 describe('cart math', () => {
   it('computes subtotal and count in integer dinars', () => {
@@ -83,49 +82,49 @@ describe('cart math', () => {
     expect(p.applied.length).toBe(0);
   });
   it('adds delivery fee when no offer applies', () => {
-    expect(priceOrder(lines, offerOf, OTHER).total).toBe(49000);
-    expect(priceOrder([L('sd-004', 1)], offerOf, KARBALA).total).toBe(12000);
+    expect(priceOrder(lines, offerOf, DELIVERY_FEE).total).toBe(49000);
+    expect(priceOrder([L('sd-004', 1)], offerOf, DELIVERY_FEE).total).toBe(14000);
     expect(priceOrder(lines, offerOf, null).deliveryKnown).toBe(false);
   });
   it('ninja offer: 3 for 25,000 with free delivery, remainder at normal price', () => {
-    expect(priceOrder([L('sd-004', 3)], offerOf, OTHER).total).toBe(25000);
-    const four = priceOrder([L('sd-004', 2, 'a'), L('sd-004', 2, 'b')], offerOf, OTHER);
+    expect(priceOrder([L('sd-004', 3)], offerOf, DELIVERY_FEE).total).toBe(25000);
+    const four = priceOrder([L('sd-004', 2, 'a'), L('sd-004', 2, 'b')], offerOf, DELIVERY_FEE);
     expect(four.applied[0].bundles).toBe(1);
     expect(four.total).toBe(34000);
-    const six = priceOrder([L('sd-004', 6)], offerOf, KARBALA);
+    const six = priceOrder([L('sd-004', 6)], offerOf, DELIVERY_FEE);
     expect(six.applied[0].bundles).toBe(2);
     expect(six.total).toBe(50000);
   });
   it('chiffon offer applies alone because free delivery makes it cheaper', () => {
-    const k = priceOrder([L('sd-002', 3)], offerOf, KARBALA);
+    const k = priceOrder([L('sd-002', 3)], offerOf, DELIVERY_FEE);
     expect(k.applied.length).toBe(1);
     expect(k.total).toBe(25000);
-    expect(priceOrder([L('sd-002', 3)], offerOf, OTHER).total).toBe(25000);
+    expect(priceOrder([L('sd-002', 3)], offerOf, DELIVERY_FEE).total).toBe(25000);
   });
   it('never charges more for an offer when delivery is already free', () => {
-    const p = priceOrder([L('sd-001', 2), L('sd-002', 3)], offerOf, OTHER);
+    const p = priceOrder([L('sd-001', 2), L('sd-002', 3)], offerOf, DELIVERY_FEE);
     expect(p.freeDelivery).toBe(true);
     expect(p.applied.map((a) => a.productId)).toEqual(['sd-001']);
     expect(p.total).toBe(48000);
-    const six = priceOrder([L('sd-002', 6)], offerOf, OTHER);
+    const six = priceOrder([L('sd-002', 6)], offerOf, DELIVERY_FEE);
     expect(six.applied[0].bundles).toBe(1);
     expect(six.total).toBe(49000);
   });
   it('counts free delivery once with two offers', () => {
-    const p = priceOrder([L('sd-001', 2), L('sd-004', 3), L('sd-003', 1)], offerOf, OTHER);
+    const p = priceOrder([L('sd-001', 2), L('sd-004', 3), L('sd-003', 1)], offerOf, DELIVERY_FEE);
     expect(p.applied.length).toBe(2);
     expect(p.deliveryFee).toBe(0);
     expect(p.total).toBe(24000 + 25000 + 10000);
   });
   it('picks offers before the governorate is chosen using the estimate', () => {
-    const p = priceOrder([L('sd-002', 3)], offerOf, null, OTHER);
+    const p = priceOrder([L('sd-002', 3)], offerOf, null, DELIVERY_FEE);
     expect(p.freeDelivery).toBe(true);
     expect(p.deliveryKnown).toBe(true);
     expect(p.total).toBe(25000);
-    expect(priceOrder([L('sd-004', 1)], offerOf, null, OTHER).deliveryKnown).toBe(false);
+    expect(priceOrder([L('sd-004', 1)], offerOf, null, DELIVERY_FEE).deliveryKnown).toBe(false);
   });
   it('does not apply offer below the quantity', () => {
-    const p = priceOrder([L('sd-001', 1)], offerOf, KARBALA);
+    const p = priceOrder([L('sd-001', 1)], offerOf, DELIVERY_FEE);
     expect(p.applied.length).toBe(0);
     expect(p.total).toBe(15000);
   });
@@ -138,7 +137,7 @@ describe('store settings', () => {
     expect(normalizeIraqiPhone(siteConfig.whatsappDisplay)).toBe('07777795064');
   });
   it('uses the confirmed delivery fees', () => {
-    expect(getDeliveryFee('كربلاء')).toBe(3000);
+    expect(getDeliveryFee('كربلاء')).toBe(5000);
     expect(getDeliveryFee('بغداد')).toBe(5000);
     expect(getDeliveryFee('البصرة')).toBe(5000);
   });

@@ -1,6 +1,6 @@
 // Sandbox-only: end-to-end checkout scenarios in a phone-sized browser.
 import { chromium } from '/home/claude/.npm-global/lib/node_modules/playwright/index.mjs';
-const BASE = 'http://localhost:4173/#/';
+const BASE = process.env.BASE || 'http://localhost:4173/#/';
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 const ctx = await b.newContext({ viewport: { width: 384, height: 832 }, isMobile: true, hasTouch: true });
 const p = await ctx.newPage();
@@ -65,10 +65,10 @@ console.log('5) التوصيل حسب المحافظة');
 await addFromPdp('jafsa-shash', 1);
 await go('cart');
 await p.selectOption('#f-governorate', 'كربلاء'); await p.waitForTimeout(100);
-check('كربلاء 3,000', (await dd('أجور التوصيل')) === '3,000 د.ع', await dd('أجور التوصيل'));
-check('الإجمالي 11,000', (await dd('المبلغ الإجمالي')) === '11,000 د.ع', await dd('المبلغ الإجمالي'));
+check('التوصيل الموحد 5,000', (await dd('أجور التوصيل')) === '5,000 د.ع', await dd('أجور التوصيل'));
+check('الإجمالي مع التوصيل 13,000', (await dd('المبلغ الإجمالي')) === '13,000 د.ع', await dd('المبلغ الإجمالي'));
 await p.selectOption('#f-governorate', 'البصرة'); await p.waitForTimeout(100);
-check('البصرة 5,000', (await dd('أجور التوصيل')) === '5,000 د.ع');
+check('نفس أجرة التوصيل لجميع المحافظات', (await dd('أجور التوصيل')) === '5,000 د.ع');
 check('الإجمالي 13,000', (await dd('المبلغ الإجمالي')) === '13,000 د.ع');
 await p.locator('.cart-line button', { hasText: 'حذف' }).click(); await p.waitForTimeout(100);
 

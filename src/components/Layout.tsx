@@ -43,7 +43,7 @@ export function PageLoader() {
   );
 }
 
-class ErrorBoundary extends Component<{ children: ReactNode; resetKey: string }, { hasError: boolean }> {
+export class ErrorBoundary extends Component<{ children: ReactNode; resetKey: string }, { hasError: boolean }> {
   state = { hasError: false };
   static getDerivedStateFromError() {
     return { hasError: true };

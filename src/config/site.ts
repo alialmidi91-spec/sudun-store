@@ -46,11 +46,8 @@ export const siteConfig = {
   /** مدة التوصيل كما يحددها المتجر */
   deliveryTime: '24 ساعة',
 
-  /**
-   * أجور التوصيل بالدينار: محافظات لها سعر خاص، والباقي يأخذ defaultDeliveryFee.
-   * ضعي defaultDeliveryFee: null إذا أردتِ أن تُؤكَّد الأجور مع الزبونة.
-   */
-  deliveryFees: { 'كربلاء': 3000 } as Partial<Record<string, number | null>>,
+  /** أجور التوصيل موحدة لجميع محافظات العراق */
+  deliveryFees: {} as Partial<Record<string, number | null>>,
   defaultDeliveryFee: 5000 as number | null,
 
   /** وضع البيانات التجريبية: يُظهر تنبيهاً بأن المنتجات تجريبية */

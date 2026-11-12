@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { products } from '../data/products';
+import { getCatalogSnapshot, subscribeCatalog } from '../lib/catalog';
 import { cartCount, cartSubtotal, clampQty, lineKey } from '../lib/cart-math';
 import { readStorage, writeStorage } from '../lib/storage';
 import type { CartLine } from '../types';
@@ -20,10 +20,15 @@ function isCartLines(v: unknown): v is CartLine[] {
   );
 }
 
-/** يحدّث الأسعار والأسماء المحفوظة حسب الكتالوج الحالي ويحذف المنتجات غير الموجودة أو النافدة */
+/**
+ * يحدّث الأسعار والأسماء المحفوظة حسب الكتالوج الحالي ويحذف المنتجات غير الموجودة أو النافدة أو المخفية.
+ * إذا الكتالوج بعده يتحمّل من قاعدة البيانات نترك السلة كما هي لحد ما يجهز (حتى ما تنمسح بالغلط).
+ */
 function syncWithCatalog(saved: CartLine[]): CartLine[] {
+  const catalog = getCatalogSnapshot();
+  if (catalog.status !== 'ready') return saved;
   return saved.flatMap((line) => {
-    const p = products.find((x) => x.id === line.productId);
+    const p = catalog.products.find((x) => x.id === line.productId);
     if (!p || !p.inStock) return [];
     return [{ ...line, name: p.name, price: p.price, slug: p.slug, quantity: clampQty(line.quantity) }];
   });
@@ -65,6 +70,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const timer = useRef<number>();
 
   useEffect(() => writeStorage(STORAGE_KEY, lines), [lines]);
+
+  // لما توصل منتجات قاعدة البيانات (أو تتحدث) نطابق السلة معها
+  useEffect(() => subscribeCatalog(() => setLines((prev) => syncWithCatalog(prev))), []);
 
   // مزامنة السلة بين أكثر من تبويب
   useEffect(() => {

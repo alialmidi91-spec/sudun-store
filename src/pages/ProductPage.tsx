@@ -1,4 +1,4 @@
-import { Banknote, ChevronLeft, MapPin, ShoppingBag, Truck } from 'lucide-react';
+import { Banknote, ChevronLeft, ShoppingBag, Truck } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WhatsappIcon } from '../components/Brand';
@@ -9,7 +9,7 @@ import { DemoNotice, ErrorState, Price, ProductBadges, QuantityStepper, SectionH
 import { PageLoader } from '../components/Layout';
 import { siteConfig } from '../config/site';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
+import { useCatalog } from '../hooks/useCatalog';
 import { categories, materialLabel } from '../data/taxonomy';
 import { useAsync } from '../hooks/useAsync';
 import { useSeo } from '../hooks/useSeo';
@@ -17,6 +17,7 @@ import { fetchProductBySlug } from '../lib/catalog';
 import { clampQty } from '../lib/cart-math';
 import { formatIQD, piecesLabel } from '../lib/format';
 import NotFoundPage from './NotFoundPage';
+import type { Product } from '../types';
 
 export default function ProductPage() {
   const { slug = '' } = useParams();
@@ -32,11 +33,12 @@ export default function ProductPage() {
   if (state.status === 'error') return <div className="container section"><ErrorState message={state.error.message} onRetry={retry} /></div>;
   if (!product) return <NotFoundPage message="هذا المنتج غير موجود أو تم حذفه." />;
 
-  return <ProductDetail key={product.id} productId={product.id} />;
+  return <ProductDetail key={product.id} product={product} />;
 }
 
-function ProductDetail({ productId }: { productId: string }) {
-  const product = products.find((p) => p.id === productId)!;
+function ProductDetail({ product }: { product: Product }) {
+  // باقي المنتجات (لقسم «من نفس الذوق») من نفس الكتالوج المنشور
+  const { products } = useCatalog();
   const { addItem } = useCart();
   const navigate = useNavigate();
 
@@ -91,7 +93,7 @@ function ProductDetail({ productId }: { productId: string }) {
       products
         .filter((p) => p.id !== product.id && (p.category === product.category || p.material === product.material))
         .slice(0, 4),
-    [product],
+    [product, products],
   );
 
   const validate = () => {
@@ -246,10 +248,8 @@ function ProductDetail({ productId }: { productId: string }) {
               <span>توصيل لجميع المحافظات خلال {siteConfig.deliveryTime}</span>
             </li>
             <li>
-              <MapPin size={18} aria-hidden="true" />
-              <span>
-                كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)} · باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)}
-              </span>
+              <Banknote size={18} aria-hidden="true" />
+              <span>التوصيل لجميع المحافظات بسعر 5,000 دينار</span>
             </li>
             <li>
               <Banknote size={18} aria-hidden="true" />

@@ -1,6 +1,6 @@
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Layout } from './components/Layout';
+import { Layout, PageLoader } from './components/Layout';
 import { CartProvider } from './context/CartContext';
 import HomePage from './pages/HomePage';
 
@@ -14,12 +14,27 @@ const DeliveryPage = lazy(() => import('./pages/DeliveryPage'));
 const ReturnsPage = lazy(() => import('./pages/ReturnsPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+// لوحة التحكم تُحمّل منفصلة فقط لمن يفتح /admin (ما تزيد حجم المتجر على الزبائن)
+const AdminLayout = lazy(() => import('./admin/AdminLayout'));
+const ProductsAdminPage = lazy(() => import('./admin/ProductsAdminPage'));
+const ProductEditorPage = lazy(() => import('./admin/ProductEditorPage'));
 
 export default function App() {
   return (
     <BrowserRouter>
       <CartProvider>
         <Routes>
+          <Route
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <AdminLayout />
+              </Suspense>
+            }
+          >
+            <Route path="admin" element={<ProductsAdminPage />} />
+            <Route path="admin/products/new" element={<ProductEditorPage />} />
+            <Route path="admin/products/:id" element={<ProductEditorPage />} />
+          </Route>
           <Route element={<Layout />}>
             <Route index element={<HomePage />} />
             <Route path="shop" element={<ShopPage />} />
