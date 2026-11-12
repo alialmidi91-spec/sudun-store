@@ -65,10 +65,10 @@ console.log('5) التوصيل حسب المحافظة');
 await addFromPdp('jafsa-shash', 1);
 await go('cart');
 await p.selectOption('#f-governorate', 'كربلاء'); await p.waitForTimeout(100);
-check('كربلاء 3,000', (await dd('أجور التوصيل')) === '3,000 د.ع', await dd('أجور التوصيل'));
-check('الإجمالي 11,000', (await dd('المبلغ الإجمالي')) === '11,000 د.ع', await dd('المبلغ الإجمالي'));
+check('التوصيل الموحد 5,000', (await dd('أجور التوصيل')) === '5,000 د.ع', await dd('أجور التوصيل'));
+check('الإجمالي مع التوصيل 13,000', (await dd('المبلغ الإجمالي')) === '13,000 د.ع', await dd('المبلغ الإجمالي'));
 await p.selectOption('#f-governorate', 'البصرة'); await p.waitForTimeout(100);
-check('البصرة 5,000', (await dd('أجور التوصيل')) === '5,000 د.ع');
+check('نفس أجرة التوصيل لجميع المحافظات', (await dd('أجور التوصيل')) === '5,000 د.ع');
 check('الإجمالي 13,000', (await dd('المبلغ الإجمالي')) === '13,000 د.ع');
 await p.locator('.cart-line button', { hasText: 'حذف' }).click(); await p.waitForTimeout(100);
 
