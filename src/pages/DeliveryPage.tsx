@@ -3,6 +3,7 @@ import { PageHeader } from '../components/ui';
 import { siteConfig } from '../config/site';
 import { useCatalog } from '../hooks/useCatalog';
 import { useSeo } from '../hooks/useSeo';
+import { formatIQD } from '../lib/format';
 
 /** سياسة التوصيل — حسب المعلومات التي أكدها المتجر */
 export default function DeliveryPage() {
