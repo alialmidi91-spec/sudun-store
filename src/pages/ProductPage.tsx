@@ -1,4 +1,4 @@
-import { Banknote, ChevronLeft, MapPin, ShoppingBag, Truck } from 'lucide-react';
+import { Banknote, ChevronLeft, ShoppingBag, Truck } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { WhatsappIcon } from '../components/Brand';
@@ -248,10 +248,8 @@ function ProductDetail({ product }: { product: Product }) {
               <span>توصيل لجميع المحافظات خلال {siteConfig.deliveryTime}</span>
             </li>
             <li>
-              <MapPin size={18} aria-hidden="true" />
-              <span>
-                كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)} · باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)}
-              </span>
+              <Banknote size={18} aria-hidden="true" />
+              <span>التوصيل لجميع المحافظات بسعر 5,000 دينار</span>
             </li>
             <li>
               <Banknote size={18} aria-hidden="true" />
