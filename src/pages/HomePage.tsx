@@ -1,4 +1,4 @@
-import { ArrowLeft, Banknote, MapPin, Truck } from 'lucide-react';
+import { ArrowLeft, Banknote, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { InstagramIcon, WhatsappIcon } from '../components/Brand';
 import { offerShort, ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
@@ -90,10 +90,10 @@ export default function HomePage() {
             </span>
           </li>
           <li>
-            <MapPin size={18} aria-hidden="true" />
+            <Banknote size={18} aria-hidden="true" />
             <span>
-              <strong>كربلاء {formatIQD(siteConfig.deliveryFees['كربلاء'] ?? 0)}</strong>
-              <small>باقي المحافظات {formatIQD(siteConfig.defaultDeliveryFee ?? 0)}</small>
+              <strong>التوصيل لجميع المحافظات</strong>
+              <small>بسعر 5,000 دينار</small>
             </span>
           </li>
           <li>
