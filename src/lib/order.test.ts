@@ -63,8 +63,7 @@ const L = (productId: string, qty: number, color = 'x'): CartLine => {
 };
 // sd-001 حرير 12,000 (قطعتين 24,000 + توصيل مجاني) · sd-002 شيفون 8,000 (3 بـ 25,000 + توصيل مجاني)
 // sd-004 نينجا 9,000 (3 بـ 25,000 + توصيل مجاني) · sd-003 جرجيت 10,000 (بدون عرض)
-const KARBALA = 3000;
-const OTHER = 5000;
+const DELIVERY_FEE = 5000;
 
 describe('cart math', () => {
   it('computes subtotal and count in integer dinars', () => {
@@ -83,8 +82,8 @@ describe('cart math', () => {
     expect(p.applied.length).toBe(0);
   });
   it('adds delivery fee when no offer applies', () => {
-    expect(priceOrder(lines, offerOf, OTHER).total).toBe(49000);
-    expect(priceOrder([L('sd-004', 1)], offerOf, KARBALA).total).toBe(12000);
+    expect(priceOrder(lines, offerOf, DELIVERY_FEE).total).toBe(49000);
+    expect(priceOrder([L('sd-004', 1)], offerOf, DELIVERY_FEE).total).toBe(14000);
     expect(priceOrder(lines, offerOf, null).deliveryKnown).toBe(false);
   });
   it('ninja offer: 3 for 25,000 with free delivery, remainder at normal price', () => {
@@ -138,7 +137,7 @@ describe('store settings', () => {
     expect(normalizeIraqiPhone(siteConfig.whatsappDisplay)).toBe('07777795064');
   });
   it('uses the confirmed delivery fees', () => {
-    expect(getDeliveryFee('كربلاء')).toBe(3000);
+    expect(getDeliveryFee('كربلاء')).toBe(5000);
     expect(getDeliveryFee('بغداد')).toBe(5000);
     expect(getDeliveryFee('البصرة')).toBe(5000);
   });
