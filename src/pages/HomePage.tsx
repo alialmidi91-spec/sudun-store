@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { InstagramIcon, WhatsappIcon } from '../components/Brand';
 import { offerShort, ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
 import { ProductImage } from '../components/ProductImage';
+import { FabricCanvas } from '../components/FabricCanvas';
 import { imageSizes, srcSetFor } from '../lib/images';
 import { Accordion, ErrorState, SectionHeading } from '../components/ui';
 import { siteConfig } from '../config/site';
@@ -48,7 +49,8 @@ export default function HomePage() {
   return (
     <>
       {/* 1. Hero بهوية سُدَن */}
-      <section className="hero">
+      <section className="hero hero--fabric">
+        <FabricCanvas />
         <img className="hero__pattern" src="/brand/star-light.png" alt="" aria-hidden="true" />
         <div className="container hero__grid">
           <div className="hero__visual">
