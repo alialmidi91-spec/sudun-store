@@ -45,7 +45,7 @@ void main() {
   vec3 color = mix(deep, bronze, smoothstep(-0.75, 0.85, folds + drift * 0.35));
   color = mix(color, silk, sheen * 0.32 + ridge * 0.12);
   color *= light + 0.68;
-  float vignette = smoothstep(0.92, 0.18, length((uv - 0.5) * vec2(1.0, 0.78)));
+  float vignette = 1.0 - smoothstep(0.18, 0.92, length((uv - 0.5) * vec2(1.0, 0.78)));
   color *= 0.68 + vignette * 0.32;
   gl_FragColor = vec4(color, 0.82);
 }`;
