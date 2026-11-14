@@ -39,6 +39,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hero--fabric .hero__visual,
-  .hero--fabric .hero__content,\n  .section--tight .grid .card { animation: none; }
+  .hero--fabric .hero__content,
+  .section--tight .grid .card { animation: none; }
   .hero--fabric .fabric-canvas { opacity: .07; }
 }
