@@ -2,6 +2,7 @@ import { ArrowLeft, Banknote, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import '../styles/sudun-motion.css';
 import { ProductRevealObserver } from '../components/ProductRevealObserver';
+import { FabricCanvas } from '../components/FabricCanvas';
 import { InstagramIcon, WhatsappIcon } from '../components/Brand';
 import { offerShort, ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
 import { ProductImage } from '../components/ProductImage';
@@ -51,7 +52,8 @@ export default function HomePage() {
     <>
       {/* 1. Hero بهوية سُدَن */}
       <ProductRevealObserver />
-      <section className="hero hero--motion">
+      <section className="hero hero--motion hero--fabric">
+        <FabricCanvas />
         <img className="hero__pattern" src="/brand/star-light.png" alt="" aria-hidden="true" />
         <div className="container hero__grid">
           <div className="hero__visual">
