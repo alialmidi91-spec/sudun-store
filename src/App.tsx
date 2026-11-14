@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import { Layout, PageLoader } from './components/Layout';
 import { CartProvider } from './context/CartContext';
 import HomePage from './pages/HomePage';
@@ -18,12 +18,26 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const ProductsAdminPage = lazy(() => import('./admin/ProductsAdminPage'));
 const ProductEditorPage = lazy(() => import('./admin/ProductEditorPage'));
+const ResetPasswordPage = lazy(() => import('./admin/ResetPasswordPage'));
+
+function RecoveryAwareHome() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const query = new URLSearchParams(window.location.search);
+    if (hash.get('type') === 'recovery' || hash.has('access_token') || query.has('token_hash')) {
+      navigate(`/admin/reset-password${window.location.search}${window.location.hash}`, { replace: true });
+    }
+  }, [navigate]);
+  return <HomePage />;
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <CartProvider>
         <Routes>
+          <Route path="admin/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
           <Route
             element={
               <Suspense fallback={<PageLoader />}>
@@ -36,7 +50,7 @@ export default function App() {
             <Route path="admin/products/:id" element={<ProductEditorPage />} />
           </Route>
           <Route element={<Layout />}>
-            <Route index element={<HomePage />} />
+            <Route index element={<RecoveryAwareHome />} />
             <Route path="shop" element={<ShopPage />} />
             <Route path="product/:slug" element={<ProductPage />} />
             <Route path="cart" element={<CartPage />} />
