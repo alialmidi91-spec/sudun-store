@@ -47,7 +47,7 @@ void main() {
   color *= light + 0.68;
   float vignette = 1.0 - smoothstep(0.18, 0.92, length((uv - 0.5) * vec2(1.0, 0.78)));
   color *= 0.68 + vignette * 0.32;
-  gl_FragColor = vec4(color, 0.82);
+  gl_FragColor = vec4(color, 0.58);
 }`;
 
 function compile(gl: WebGLRenderingContext, type: number, source: string) {
@@ -69,21 +69,6 @@ export function FabricCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const revealItems = Array.from(document.querySelectorAll<HTMLElement>('.section--tight .grid > *'));
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      revealItems.forEach((item) => {
-        item.classList.add('sudun-reveal');
-        revealObserver.observe(item);
-      });
-    }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const gl = canvas.getContext('webgl', { alpha: true, antialias: false, powerPreference: 'low-power' });
     if (!gl) {
@@ -127,7 +112,7 @@ export function FabricCanvas() {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, window.matchMedia('(max-width: 599px)').matches ? 1 : 1.35);
       const width = Math.max(1, Math.round(rect.width * dpr));
       const height = Math.max(1, Math.round(rect.height * dpr));
       if (canvas.width !== width || canvas.height !== height) {
@@ -176,7 +161,6 @@ export function FabricCanvas() {
       disposed = true;
       if (frame) cancelAnimationFrame(frame);
       observer.disconnect();
-      revealObserver.disconnect();
       canvas.removeEventListener('pointermove', onPointer);
       window.removeEventListener('resize', resize);
       reduced.removeEventListener?.('change', onMotionChange);
