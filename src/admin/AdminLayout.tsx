@@ -110,13 +110,9 @@ function SetupNeeded() {
       </h1>
       <p>لوحة التحكم تحتاج ربط Supabase حتى تُحفظ التعديلات بشكل دائم وتظهر للزبائن.</p>
       <ol className="admin-steps">
-        <li>
-          شغّلي ملفي <code>supabase/migrations/001_products_admin.sql</code> ثم <code>supabase/seed_products.sql</code> في SQL Editor.
-        </li>
-        <li>
-          في Netlify أضيفي <code dir="ltr">VITE_SUPABASE_URL</code> و<code dir="ltr">VITE_SUPABASE_ANON_KEY</code> (المفتاح العام فقط).
-        </li>
-        <li>أعيدي النشر (Deploy) ثم افتحي هذه الصفحة.</li>
+        <li>تأكدي من وجود متغيرَي Supabase في إعدادات بناء Cloudflare لهذا الفرع.</li>
+        <li><code dir="ltr">VITE_SUPABASE_URL</code> = رابط مشروع Supabase، و<code dir="ltr">VITE_SUPABASE_ANON_KEY</code> = المفتاح العام فقط.</li>
+        <li>أعيدي بناء نسخة Preview بعد حفظ المتغيرات، ثم افتحي لوحة التحكم من جديد.</li>
       </ol>
       <p className="admin-muted">التفاصيل الكاملة في ملف docs/ADMIN_SETUP.md بالمستودع. المتجر يعمل حالياً من البيانات الثابتة.</p>
     </div>
