@@ -1,4 +1,4 @@
-import { AlertTriangle, ExternalLink, LogOut, Package, Plus } from 'lucide-react';
+import { AlertTriangle, ExternalLink, KeyRound, LogOut, Package, Plus } from 'lucide-react';
 import { Suspense, useEffect, useState, type FormEvent } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Logo } from '../components/Brand';
