@@ -1992,3 +1992,66 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .admin-dialog__actions .btn { flex: 1 1 140px; }
 .btn--danger-solid { --btn-bg: var(--danger); --btn-fg: #fff; --btn-border: var(--danger); }
 .btn--danger-solid:hover:not(:disabled) { --btn-bg: #7c1f1f; --btn-border: #7c1f1f; }
+
+
+/* ---------- SUDUN silk experience: GPU fabric layer ---------- */
+.hero--fabric {
+  isolation: isolate;
+  background:
+    radial-gradient(100% 90% at 78% 8%, rgba(125, 91, 66, 0.42) 0%, transparent 62%),
+    linear-gradient(145deg, #211915 0%, #17110e 72%, #2b1f19 100%);
+}
+.fabric-canvas {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.72;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.fabric-canvas[data-fallback='true'] {
+  opacity: 0.36;
+  background:
+    radial-gradient(ellipse at 18% 30%, rgba(210,176,143,.28), transparent 36%),
+    radial-gradient(ellipse at 76% 70%, rgba(176,138,106,.24), transparent 42%);
+}
+.hero--fabric .hero__pattern { z-index: 1; opacity: 0.035; }
+.hero--fabric .hero__grid,
+.hero--fabric .hero__facts { z-index: 2; }
+.hero--fabric .hero__arch {
+  transform: translateZ(0);
+  transition: transform 700ms cubic-bezier(.2,.7,.2,1), box-shadow 700ms ease;
+}
+.hero--fabric .hero__arch:hover {
+  transform: translateY(-7px) scale(1.018);
+  box-shadow: 0 0 0 1px rgba(210,176,143,.72), 0 0 0 9px rgba(210,176,143,.1), 0 36px 70px -30px rgba(0,0,0,.92);
+}
+.hero--fabric .hero__content { position: relative; }
+.hero--fabric .hero__eyebrow { text-shadow: 0 2px 20px rgba(0,0,0,.45); }
+@media (max-width: 899px) {
+  .fabric-canvas { opacity: .48; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fabric-canvas { opacity: .22; }
+  .hero--fabric .hero__arch { transition: none; }
+}
+
+
+/* خلفية حريرية متحركة بهدوء خلف محتوى الـ hero فقط */
+.hero--fabric { isolation: isolate; }
+.hero--fabric .fabric-canvas {
+  z-index: 0;
+  opacity: 0.34;
+  mix-blend-mode: screen;
+}
+.hero--fabric .hero__pattern { z-index: 1; opacity: 0.035; }
+.hero--fabric .hero__grid,
+.hero--fabric .hero__facts { position: relative; z-index: 2; }
+@media (max-width: 599px) {
+  .hero--fabric .fabric-canvas { opacity: 0.24; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero--fabric .fabric-canvas { opacity: 0.18; }
+}

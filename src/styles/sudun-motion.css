@@ -1,0 +1,41 @@
+/* SUDUN: visible but restrained interface motion. */
+.hero--motion .hero__visual,
+.hero--motion .hero__content {
+  animation: sudun-hero-enter 900ms cubic-bezier(.2,.7,.2,1) both;
+}
+.hero--motion .hero__content { animation-delay: 180ms; }
+.hero--motion .hero__visual { animation-delay: 0ms; }
+.hero--motion .hero__arch {
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1), box-shadow 420ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hero--motion .hero__arch:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 36px -26px rgba(45,31,23,.42);
+  }
+}
+.section--tight .grid > .card.sudun-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--reveal-index, 0) * 85ms);
+}
+.section--tight .grid > .card.sudun-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@keyframes sudun-hero-enter {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero--motion .hero__visual,
+  .hero--motion .hero__content { animation: none; }
+  .hero--motion .hero__arch,
+  .section--tight .grid > .card.sudun-reveal,
+  .section--tight .grid > .card.sudun-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
