@@ -69,6 +69,21 @@ export function FabricCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const revealItems = Array.from(document.querySelectorAll<HTMLElement>('.section--tight .grid > *'));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      revealItems.forEach((item) => {
+        item.classList.add('sudun-reveal');
+        revealObserver.observe(item);
+      });
+    }
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const gl = canvas.getContext('webgl', { alpha: true, antialias: false, powerPreference: 'low-power' });
     if (!gl) {
@@ -161,6 +176,7 @@ export function FabricCanvas() {
       disposed = true;
       if (frame) cancelAnimationFrame(frame);
       observer.disconnect();
+      revealObserver.disconnect();
       canvas.removeEventListener('pointermove', onPointer);
       window.removeEventListener('resize', resize);
       reduced.removeEventListener?.('change', onMotionChange);
