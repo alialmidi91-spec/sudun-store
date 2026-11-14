@@ -1,4 +1,4 @@
-# تشغيل لوحة التحكم (Supabase المجاني + Netlify)
+# تشغيل لوحة التحكم (Supabase المجاني + Cloudflare Workers)
 
 اللوحة على الرابط `/admin`. تحفظ المنتجات بقاعدة بيانات Supabase بشكل دائم، والزبائن يشوفون التعديلات بعد الحفظ مباشرة (عند فتح الموقع، أو خلال دقيقة كحد أقصى لمن الصفحة مفتوحة عنده).
 
@@ -25,15 +25,15 @@
    يجب أن تظهر `INSERT 0 1`. إذا ظهر `INSERT 0 0` فالبريد غير مطابق.
 3. **مهم:** **Authentication** ← **Sign In / Providers** ← أطفئي **Allow new users to sign up**. (حتى لو بقيت مفعّلة، أي حساب جديد ما يقدر يعدّل شي لأنه مو بجدول admins — بس الأفضل إطفاؤها.)
 
-## 4) ربط الموقع (Netlify)
+## 4) ربط الموقع (Cloudflare Workers Builds)
 1. Supabase ← **Project Settings** ← **API** (أو **API Keys**): انسخي
    - **Project URL** مثل `https://abcd1234.supabase.co`
    - المفتاح العام **anon public** (أو **Publishable key** الذي يبدأ بـ `sb_publishable_`)
    - ⚠️ **لا تنسخي** `service_role` ولا أي مفتاح يبدأ بـ `sb_secret_`. هذا سري ولا يوضع بالموقع. (الموقع يرفضه تلقائياً لو انحط بالغلط.)
-2. Netlify ← موقعچ ← **Site configuration** ← **Environment variables** ← **Add a variable**:
+2. Cloudflare Dashboard ← Workers & Pages ← Worker `sudun-store` ← Settings / Builds ← **Environment variables**:
    - `VITE_SUPABASE_URL` = Project URL
    - `VITE_SUPABASE_ANON_KEY` = المفتاح العام
-3. **Deploys** ← **Trigger deploy** ← **Deploy site**.
+3. احفظي الإعدادات ثم شغّلي Build جديداً للفرع المطلوب.
 4. افتحي `https://<موقعچ>/admin` وسجّلي الدخول.
 
 ## 5) فحص سريع بعد الربط
