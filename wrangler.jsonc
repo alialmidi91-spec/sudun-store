@@ -1,10 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sudun-store",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-11-12",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
+  },
+  "vars": {
+    "SUPABASE_URL": "https://ucuhttpdyonnvrzarede.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_WvxaSkm8bnTaIissIev3Mw_lNz5JXVM"
   },
   "previews": {}
 }
