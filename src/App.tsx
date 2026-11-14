@@ -20,12 +20,24 @@ const ProductsAdminPage = lazy(() => import('./admin/ProductsAdminPage'));
 const ProductEditorPage = lazy(() => import('./admin/ProductEditorPage'));
 const ResetPasswordPage = lazy(() => import('./admin/ResetPasswordPage'));
 
+function RecoveryRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const query = new URLSearchParams(window.location.search);
+    if (hash.get('type') === 'recovery' || hash.has('access_token') || query.has('token_hash') || query.get('type') === 'recovery') {
+      navigate(`/admin/reset-password${window.location.search}${window.location.hash}`, { replace: true });
+    }
+  }, [navigate]);
+  return <HomePage />;
+}
+
 function RecoveryAwareHome() {
   const navigate = useNavigate();
   useEffect(() => {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const query = new URLSearchParams(window.location.search);
-    if (hash.get('type') === 'recovery' || hash.has('access_token') || query.has('token_hash')) {
+    if (hash.get('type') === 'recovery' || hash.has('access_token') || query.has('token_hash') || query.get('type') === 'recovery') {
       navigate(`/admin/reset-password${window.location.search}${window.location.hash}`, { replace: true });
     }
   }, [navigate]);
@@ -37,6 +49,7 @@ export default function App() {
     <BrowserRouter>
       <CartProvider>
         <Routes>
+          <Route path="auth/confirm" element={<RecoveryRedirect />} />
           <Route path="admin/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
           <Route
             element={
