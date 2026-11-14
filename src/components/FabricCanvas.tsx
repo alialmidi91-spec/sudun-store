@@ -139,6 +139,12 @@ export function FabricCanvas() {
 
     function render(now: number) {
       if (disposed || !visible) { frame = 0; return; }
+      // Cap GPU draws at ~30 FPS: keeps the silk motion smooth while reducing
+      // fragment-shader work on mid-range phones and battery-powered devices.
+      if (previous && now - previous < 1000 / 30) {
+        frame = requestAnimationFrame(render);
+        return;
+      }
       if (previous) elapsed += Math.min((now - previous) / 1000, 0.05);
       previous = now;
       gl.useProgram(program);
