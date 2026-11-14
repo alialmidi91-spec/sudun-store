@@ -1,5 +1,6 @@
 import { ArrowLeft, Banknote, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import '../styles/sudun-motion.css';
 import { InstagramIcon, WhatsappIcon } from '../components/Brand';
 import { offerShort, ProductGrid, ProductGridSkeleton } from '../components/ProductCard';
 import { ProductImage } from '../components/ProductImage';
