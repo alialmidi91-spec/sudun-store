@@ -2037,3 +2037,21 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
   .fabric-canvas { opacity: .22; }
   .hero--fabric .hero__arch { transition: none; }
 }
+
+
+/* خلفية حريرية متحركة بهدوء خلف محتوى الـ hero فقط */
+.hero--fabric { isolation: isolate; }
+.hero--fabric .fabric-canvas {
+  z-index: 0;
+  opacity: 0.34;
+  mix-blend-mode: screen;
+}
+.hero--fabric .hero__pattern { z-index: 1; opacity: 0.035; }
+.hero--fabric .hero__grid,
+.hero--fabric .hero__facts { position: relative; z-index: 2; }
+@media (max-width: 599px) {
+  .hero--fabric .fabric-canvas { opacity: 0.24; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero--fabric .fabric-canvas { opacity: 0.18; }
+}
