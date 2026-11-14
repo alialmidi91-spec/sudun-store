@@ -161,6 +161,15 @@ export async function refreshSession(refreshToken: string): Promise<AuthSession>
   return toSession(t);
 }
 
+/** يرسل رابط استعادة مباشر إلى صفحة تغيير كلمة المرور في لوحة الإدارة. */
+export async function requestPasswordRecovery(email: string, redirectTo = `${window.location.origin}/admin/reset-password`): Promise<void> {
+  const redirect = encodeURIComponent(redirectTo);
+  await request(`/auth/v1/recover?redirect_to=${redirect}`, {
+    method: 'POST',
+    body: { email: email.trim() },
+  });
+}
+
 /** يتحقق من رابط استعادة كلمة المرور باستخدام token_hash المرسل بالبريد. */
 export async function verifyRecoveryToken(tokenHash: string): Promise<AuthSession> {
   const t = await request<TokenResponse>('/auth/v1/verify', {
