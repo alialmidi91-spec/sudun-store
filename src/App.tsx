@@ -18,7 +18,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const ProductsAdminPage = lazy(() => import('./admin/ProductsAdminPage'));
 const ProductEditorPage = lazy(() => import('./admin/ProductEditorPage'));
-const ResetPasswordPage = lazy(() => import('./admin/ResetPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./admin/ResetPasswordPage'));\nconst AdminPasswordPage = lazy(() => import('./admin/AdminPasswordPage'));
 
 function RecoveryRedirect() {
   const navigate = useNavigate();
@@ -60,7 +60,7 @@ export default function App() {
           >
             <Route path="admin" element={<ProductsAdminPage />} />
             <Route path="admin/products/new" element={<ProductEditorPage />} />
-            <Route path="admin/products/:id" element={<ProductEditorPage />} />
+            <Route path="admin/products/:id" element={<ProductEditorPage />} />\n            <Route path="admin/security" element={<AdminPasswordPage />} />
           </Route>
           <Route element={<Layout />}>
             <Route index element={<RecoveryAwareHome />} />
