@@ -1,7 +1,7 @@
 /**
  * إعدادات Supabase (قاعدة بيانات المنتجات + صور + دخول المدير).
  *
- * القيم تأتي من متغيرات البيئة وقت البناء (Netlify → Site configuration → Environment variables):
+ * القيم تأتي من متغيرات البيئة وقت البناء (Cloudflare → Workers Builds → Environment variables):
  *   VITE_SUPABASE_URL        مثل https://xxxx.supabase.co
  *   VITE_SUPABASE_ANON_KEY   المفتاح العام (anon / publishable) — آمن للواجهة لأن الحماية بسياسات RLS
  *

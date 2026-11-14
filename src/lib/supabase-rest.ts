@@ -35,7 +35,7 @@ function arabicMessage(status: number, code: string | undefined, raw: string): s
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   /** JSON body */
   body?: unknown;
   /** ملف خام (للصور) */
@@ -159,6 +159,41 @@ export async function signInWithPassword(email: string, password: string): Promi
 export async function refreshSession(refreshToken: string): Promise<AuthSession> {
   const t = await request<TokenResponse>('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: refreshToken } });
   return toSession(t);
+}
+
+/** يرسل رابط استعادة مباشر إلى صفحة تغيير كلمة المرور في لوحة الإدارة. */
+export async function requestPasswordRecovery(email: string, redirectTo = `${window.location.origin}/admin/reset-password`): Promise<void> {
+  const redirect = encodeURIComponent(redirectTo);
+  await request(`/auth/v1/recover?redirect_to=${redirect}`, {
+    method: 'POST',
+    body: { email: email.trim() },
+  });
+}
+
+/** يتحقق من رابط استعادة كلمة المرور باستخدام token_hash المرسل بالبريد. */
+export async function verifyRecoveryToken(tokenHash: string): Promise<AuthSession> {
+  const t = await request<TokenResponse>('/auth/v1/verify', {
+    method: 'POST',
+    body: { token_hash: tokenHash, type: 'recovery' },
+  });
+  return toSession(t);
+}
+
+/** يبني جلسة استعادة من access_token الموجود في رابط Supabase (implicit flow). */
+export async function getRecoverySession(accessToken: string, refreshToken: string, expiresIn: number): Promise<AuthSession> {
+  const user = await request<{ id: string; email?: string }>('/auth/v1/user', { token: accessToken });
+  if (!user?.id) throw new SupabaseError('رابط الاستعادة غير صالح أو انتهت صلاحيته. اطلبي رسالة جديدة.', 401, 'invalid_recovery');
+  return {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    expires_at: Math.floor(Date.now() / 1000) + Math.max(0, expiresIn || 3600),
+    user: { id: user.id, email: user.email },
+  };
+}
+
+/** يحفظ كلمة المرور الجديدة للجلسة المؤقتة التي أنشأها رابط الاستعادة. */
+export async function updateRecoveredPassword(password: string, token: string): Promise<void> {
+  await request('/auth/v1/user', { method: 'PUT', body: { password }, token });
 }
 
 export async function signOut(token: string): Promise<void> {

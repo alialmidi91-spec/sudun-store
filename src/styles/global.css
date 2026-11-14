@@ -2055,3 +2055,35 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 @media (prefers-reduced-motion: reduce) {
   .hero--fabric .fabric-canvas { opacity: 0.18; }
 }
+
+
+/* ---------- Admin password recovery ---------- */
+.admin-recovery {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: calc(24px + var(--safe-top)) var(--pad-r) calc(24px + var(--safe-bottom)) var(--pad-l);
+  background:
+    radial-gradient(ellipse at 85% 10%, rgba(176, 138, 106, 0.14), transparent 42%),
+    var(--ivory);
+}
+.admin-recovery__card {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+}
+.admin-recovery__brand {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+.admin-recovery__form {
+  display: grid;
+  gap: 14px;
+}
+.admin-recovery__card > .admin-muted {
+  text-align: center;
+}
+.admin-recovery__card > .admin-title {
+  text-align: center;
+}

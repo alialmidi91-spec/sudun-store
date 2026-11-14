@@ -5,6 +5,7 @@ import { Logo } from '../components/Brand';
 import { ErrorBoundary, PageLoader } from '../components/Layout';
 import { isSupabaseConfigured } from '../config/supabase';
 import { AdminProvider, useAdmin } from './session';
+import { requestPasswordRecovery } from '../lib/supabase-rest';
 
 /** إطار لوحة التحكم: منفصل عن هيدر وفوتر المتجر، ومخفي عن محركات البحث */
 export default function AdminLayout() {
@@ -109,13 +110,9 @@ function SetupNeeded() {
       </h1>
       <p>لوحة التحكم تحتاج ربط Supabase حتى تُحفظ التعديلات بشكل دائم وتظهر للزبائن.</p>
       <ol className="admin-steps">
-        <li>
-          شغّلي ملفي <code>supabase/migrations/001_products_admin.sql</code> ثم <code>supabase/seed_products.sql</code> في SQL Editor.
-        </li>
-        <li>
-          في Netlify أضيفي <code dir="ltr">VITE_SUPABASE_URL</code> و<code dir="ltr">VITE_SUPABASE_ANON_KEY</code> (المفتاح العام فقط).
-        </li>
-        <li>أعيدي النشر (Deploy) ثم افتحي هذه الصفحة.</li>
+        <li>تأكدي من وجود متغيرَي Supabase في إعدادات بناء Cloudflare لهذا الفرع.</li>
+        <li><code dir="ltr">VITE_SUPABASE_URL</code> = رابط مشروع Supabase، و<code dir="ltr">VITE_SUPABASE_ANON_KEY</code> = المفتاح العام فقط.</li>
+        <li>أعيدي بناء نسخة Preview بعد حفظ المتغيرات، ثم افتحي لوحة التحكم من جديد.</li>
       </ol>
       <p className="admin-muted">التفاصيل الكاملة في ملف docs/ADMIN_SETUP.md بالمستودع. المتجر يعمل حالياً من البيانات الثابتة.</p>
     </div>
@@ -128,41 +125,56 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [notice, setNotice] = useState('');
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      setError('اكتبي البريد الإلكتروني وكلمة المرور.');
+    if (!email.trim() || (!forgotPassword && !password)) {
+      setError(forgotPassword ? 'اكتبي البريد الإلكتروني.' : 'اكتبي البريد الإلكتروني وكلمة المرور.');
       return;
     }
     setBusy(true);
     setError('');
+    setNotice('');
     try {
-      await signIn(email, password);
+      if (forgotPassword) {
+        await requestPasswordRecovery(email);
+        setNotice('إذا كان البريد مسجلاً، راح توصلك رسالة استعادة. افتحي أحدث رسالة واضغطي الرابط مرة واحدة.');
+      } else {
+        await signIn(email, password);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'تعذّر تسجيل الدخول.');
+      setError(err instanceof Error ? err.message : (forgotPassword ? 'تعذّر إرسال رسالة الاستعادة.' : 'تعذّر تسجيل الدخول.'));
+    } finally {
       setBusy(false);
     }
   };
 
   return (
     <form className="admin-card admin-card--narrow admin-login" onSubmit={submit} noValidate>
-      <h1 className="admin-title">تسجيل دخول المدير</h1>
+      <h1 className="admin-title">{forgotPassword ? 'استعادة كلمة المرور' : 'تسجيل دخول المدير'}</h1>
       <div className="field">
         <label htmlFor="admin-email">البريد الإلكتروني</label>
         <input id="admin-email" className="input" type="email" dir="ltr" autoComplete="username" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
-      <div className="field">
-        <label htmlFor="admin-password">كلمة المرور</label>
-        <input id="admin-password" className="input" type="password" dir="ltr" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </div>
+      {!forgotPassword && (
+        <div className="field">
+          <label htmlFor="admin-password">كلمة المرور</label>
+          <input id="admin-password" className="input" type="password" dir="ltr" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+      )}
       {error && (
         <p className="form-error" role="alert">
           {error}
         </p>
       )}
+      {notice && <p className="admin-notice" role="status">{notice}</p>}
       <button type="submit" className="btn btn--dark btn--lg" disabled={busy}>
-        {busy ? 'جارٍ الدخول…' : 'دخول'}
+        {busy ? (forgotPassword ? 'جارٍ الإرسال…' : 'جارٍ الدخول…') : (forgotPassword ? 'إرسال رابط الاستعادة' : 'دخول')}
+      </button>
+      <button type="button" className="btn btn--link" onClick={() => { setForgotPassword((value) => !value); setError(''); setNotice(''); }}>
+        {forgotPassword ? 'العودة إلى تسجيل الدخول' : 'نسيت كلمة المرور؟'}
       </button>
     </form>
   );
