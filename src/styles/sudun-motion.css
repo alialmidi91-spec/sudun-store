@@ -1,53 +1,43 @@
-/* SUDUN: visible, accessible motion that responds to actual scrolling. */
-.hero--fabric .hero__visual,
-.hero--fabric .hero__content {
-  animation: sudun-hero-enter 820ms cubic-bezier(.2,.7,.2,1) both;
+/* SUDUN: restrained entrance and product reveal motion. */
+.hero--motion .hero__visual,
+.hero--motion .hero__content {
+  animation: sudun-hero-enter 700ms cubic-bezier(.2,.7,.2,1) both;
 }
-.hero--fabric .hero__content { animation-delay: 110ms; }
-.hero--fabric .hero__visual { animation-delay: 40ms; }
-
-/* The fabric was too faint on phones; raise contrast without obscuring products or copy. */
-.hero--fabric .fabric-canvas { opacity: .34; }
-@media (max-width: 899px) {
-  .hero--fabric .fabric-canvas { opacity: .26; }
+.hero--motion .hero__content { animation-delay: 100ms; }
+.hero--motion .hero__visual { animation-delay: 30ms; }
+.hero--motion .hero__arch {
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1), box-shadow 420ms ease;
 }
-
-/* Cards are revealed by IntersectionObserver as they enter the viewport. */
+@media (hover: hover) and (pointer: fine) {
+  .hero--motion .hero__arch:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px -26px rgba(45,31,23,.42);
+  }
+}
 .section--tight .grid > .sudun-reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 560ms cubic-bezier(.2,.7,.2,1), transform 560ms cubic-bezier(.2,.7,.2,1);
+  transform: translateY(18px);
+  transition: opacity 480ms ease, transform 480ms ease;
 }
 .section--tight .grid > .sudun-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
-.section--tight .grid > .sudun-reveal:nth-child(2) { transition-delay: 70ms; }
-.section--tight .grid > .sudun-reveal:nth-child(3) { transition-delay: 140ms; }
-.section--tight .grid > .sudun-reveal:nth-child(4) { transition-delay: 210ms; }
-
-.hero--fabric .hero__arch {
-  transition: transform 500ms cubic-bezier(.2,.7,.2,1), box-shadow 500ms ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .hero--fabric .hero__arch:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 0 1px rgba(210,176,143,.62), 0 24px 48px -28px rgba(0,0,0,.8);
-  }
-}
+.section--tight .grid > .sudun-reveal:nth-child(2) { transition-delay: 60ms; }
+.section--tight .grid > .sudun-reveal:nth-child(3) { transition-delay: 120ms; }
+.section--tight .grid > .sudun-reveal:nth-child(4) { transition-delay: 180ms; }
 @keyframes sudun-hero-enter {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero--fabric .hero__visual,
-  .hero--fabric .hero__content { animation: none; }
+  .hero--motion .hero__visual,
+  .hero--motion .hero__content { animation: none; }
+  .hero--motion .hero__arch,
   .section--tight .grid > .sudun-reveal,
   .section--tight .grid > .sudun-reveal.is-visible {
     opacity: 1;
     transform: none;
     transition: none;
   }
-  .hero--fabric .fabric-canvas { opacity: .16; }
-  .hero--fabric .hero__arch { transition: none; }
 }
