@@ -13,7 +13,9 @@ export function ProductRevealObserver() {
     let index = 0;
 
     const observeCards = () => {
-      const cards = section.querySelectorAll<HTMLElement>('.grid > .card:not([data-sudun-motion])');
+      // Horizontal product rails must not receive the vertical reveal transform:
+      // it makes cards appear to jump while the user scrolls or swipes.
+      const cards = section.querySelectorAll<HTMLElement>('.grid:not(.grid--rail) > .card:not([data-sudun-motion])');
       cards.forEach((card) => {
         card.dataset.sudunMotion = 'true';
         card.classList.add('sudun-reveal');
@@ -31,7 +33,6 @@ export function ProductRevealObserver() {
       });
     }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
 
-    // ProductGrid is populated asynchronously, so watch for cards added after mount.
     observeCards();
     const mutationObserver = new MutationObserver(observeCards);
     mutationObserver.observe(section, { childList: true, subtree: true });
