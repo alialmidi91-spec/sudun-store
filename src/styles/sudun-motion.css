@@ -39,29 +39,3 @@
     transition: none;
   }
 }
-
-
-/* Mobile rail: keep product cards stationary vertically while the user swipes horizontally. */
-@media (max-width: 899px) {
-  .section--tight .grid--rail {
-    scroll-snap-type: x proximity;
-    scroll-snap-stop: normal;
-    scroll-behavior: auto;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y;
-    overscroll-behavior-x: contain;
-  }
-
-  .section--tight .grid--rail > .card.sudun-reveal,
-  .section--tight .grid--rail > .card.sudun-reveal.is-visible {
-    transform: none;
-    transition: opacity 420ms ease;
-    transition-delay: 0ms;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .section--tight .grid--rail {
-    scroll-behavior: auto;
-  }
-}
