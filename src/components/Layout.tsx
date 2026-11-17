@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { MobileNav } from './MobileNav';
+import '../styles/premium-motion.css';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
