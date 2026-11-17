@@ -1,0 +1,160 @@
+/* SUDUN premium motion layer — CSS-only, restrained and mobile-first. */
+:root {
+  --sudun-motion-ease: cubic-bezier(.2,.72,.22,1);
+  --sudun-motion-fast: 220ms;
+  --sudun-motion-base: 420ms;
+}
+
+/* Smooth route entrance without delaying navigation or changing page logic. */
+.page-transition {
+  animation: sudun-page-enter 560ms var(--sudun-motion-ease) both;
+}
+@keyframes sudun-page-enter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Header: cleaner glass surface while scrolling. */
+.site-header {
+  transition: background-color var(--sudun-motion-base) ease, box-shadow var(--sudun-motion-base) ease, border-color var(--sudun-motion-base) ease;
+}
+.site-header.is-scrolled {
+  background: rgba(248, 245, 239, .94);
+  border-bottom-color: rgba(176, 138, 106, .24);
+  box-shadow: 0 10px 28px -24px rgba(33, 25, 21, .58);
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  backdrop-filter: blur(16px) saturate(1.12);
+}
+.site-nav a {
+  position: relative;
+  transition: color var(--sudun-motion-fast) ease;
+}
+.site-nav a::after {
+  content: "";
+  position: absolute;
+  inset-inline: 50%;
+  bottom: -7px;
+  height: 1px;
+  background: var(--bronze);
+  transition: inset-inline var(--sudun-motion-base) var(--sudun-motion-ease);
+}
+.site-nav a:hover::after,
+.site-nav a.active::after { inset-inline: 0; }
+
+/* Product cards: subtle lift, controlled image zoom, no layout shift. */
+.grid > .card {
+  transform: translateZ(0);
+  transition: transform var(--sudun-motion-base) var(--sudun-motion-ease), box-shadow var(--sudun-motion-base) ease, border-color var(--sudun-motion-base) ease;
+}
+.card__media {
+  overflow: hidden;
+  isolation: isolate;
+}
+.card__media .product-image,
+.card__media img {
+  transform: scale(1.001);
+  transition: transform 760ms var(--sudun-motion-ease), filter 520ms ease;
+  will-change: transform;
+}
+.card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(115deg, transparent 28%, rgba(255,255,255,.18) 48%, transparent 68%);
+  transform: translateX(-110%);
+  transition: transform 900ms var(--sudun-motion-ease), opacity 260ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .grid > .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 22px 42px -32px rgba(33, 25, 21, .48);
+    border-color: rgba(176, 138, 106, .48);
+  }
+  .card:hover .card__media .product-image,
+  .card:hover .card__media img { transform: scale(1.045); }
+  .card:hover .card__media::after {
+    opacity: 1;
+    transform: translateX(110%);
+  }
+}
+
+/* Buttons and category highlights respond like tactile controls. */
+.btn,
+.icon-btn,
+.highlight__ring,
+.pdp__thumb,
+.chip {
+  transition:
+    transform var(--sudun-motion-fast) var(--sudun-motion-ease),
+    box-shadow var(--sudun-motion-fast) ease,
+    background-color var(--sudun-motion-fast) ease,
+    border-color var(--sudun-motion-fast) ease,
+    color var(--sudun-motion-fast) ease;
+}
+.btn:active,
+.icon-btn:active,
+.chip:active { transform: scale(.975); }
+.highlight__ring { will-change: transform; }
+@media (hover: hover) and (pointer: fine) {
+  .highlight:hover .highlight__ring { transform: translateY(-4px) scale(1.035); }
+  .pdp__thumb:hover { transform: translateY(-2px); }
+}
+
+/* Product detail: refined image frame and thumbnail feedback. */
+.pdp__main-image {
+  overflow: hidden;
+  background: linear-gradient(145deg, #f0e8dc, #fbf8f3);
+}
+.pdp__main-image .product-image,
+.pdp__main-image img {
+  animation: sudun-image-enter 620ms var(--sudun-motion-ease) both;
+}
+@keyframes sudun-image-enter {
+  from { opacity: .65; transform: scale(1.018); }
+  to { opacity: 1; transform: scale(1); }
+}
+.pdp__thumb.is-active {
+  box-shadow: 0 0 0 2px var(--bronze), 0 5px 16px -10px rgba(33,25,21,.55);
+}
+
+/* Filters and overlays feel less abrupt while remaining quick. */
+.sheet,
+.search-dialog,
+.drawer,
+.toast {
+  animation: sudun-surface-enter 320ms var(--sudun-motion-ease) both;
+}
+@keyframes sudun-surface-enter {
+  from { opacity: 0; transform: translate3d(0, 10px, 0) scale(.99); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* Respect accessibility preferences and avoid hover-only motion on touch screens. */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition,
+  .pdp__main-image .product-image,
+  .pdp__main-image img,
+  .sheet,
+  .search-dialog,
+  .drawer,
+  .toast { animation: none !important; }
+  .site-header,
+  .site-nav a,
+  .site-nav a::after,
+  .grid > .card,
+  .card__media .product-image,
+  .card__media img,
+  .card__media::after,
+  .btn,
+  .icon-btn,
+  .highlight__ring,
+  .pdp__thumb,
+  .chip { transition: none !important; }
+  .grid > .card,
+  .grid > .card:hover,
+  .highlight:hover .highlight__ring,
+  .pdp__thumb:hover { transform: none !important; }
+}
