@@ -83,11 +83,13 @@ export function Layout() {
       <ScrollToTop />
       <Header />
       <main id="main" tabIndex={-1}>
-        <ErrorBoundary resetKey={pathname}>
-          <Suspense fallback={<PageLoader />}>
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
+        <div className="page-transition" key={pathname}>
+          <ErrorBoundary resetKey={pathname}>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
       </main>
       <Footer />
       <MobileNav />
