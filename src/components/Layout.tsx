@@ -5,6 +5,8 @@ import { useCart } from '../context/CartContext';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { MobileNav } from './MobileNav';
+import '../styles/premium-motion.css';
+import '../styles/premium-visuals.css';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -83,11 +85,13 @@ export function Layout() {
       <ScrollToTop />
       <Header />
       <main id="main" tabIndex={-1}>
-        <ErrorBoundary resetKey={pathname}>
-          <Suspense fallback={<PageLoader />}>
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
+        <div className="page-transition" key={pathname}>
+          <ErrorBoundary resetKey={pathname}>
+            <Suspense fallback={<PageLoader />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
       </main>
       <Footer />
       <MobileNav />
