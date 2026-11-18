@@ -2124,3 +2124,12 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
     height: 19px;
   }
 }
+
+@media (max-width: 599px) {
+  .hero--fabric .hero__text {
+    max-width: 29ch;
+    margin-inline: auto;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+}
