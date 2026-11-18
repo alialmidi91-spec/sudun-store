@@ -2055,3 +2055,81 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 @media (prefers-reduced-motion: reduce) {
   .hero--fabric .fabric-canvas { opacity: 0.18; }
 }
+
+
+/* ---------- Mobile storefront refinement: compact hero + navigation ---------- */
+@media (max-width: 599px) {
+  .hero--fabric .hero__grid {
+    gap: 12px;
+    padding-block: 14px 12px;
+  }
+  .hero--fabric .hero__visual {
+    padding-bottom: 0;
+  }
+  .hero--fabric .hero__arch {
+    width: min(52%, 208px);
+    aspect-ratio: 5 / 5.8;
+  }
+  /* صورة واحدة واضحة على الهاتف؛ الصورة الثانوية تبقى للشاشات الواسعة */
+  .hero--fabric .hero__arch--small {
+    display: none;
+  }
+  .hero--fabric .hero__eyebrow {
+    margin-bottom: 2px;
+    font-size: 0.7rem;
+  }
+  .hero--fabric .hero__title {
+    font-size: clamp(2rem, 8.5vw, 2.65rem);
+    line-height: 1.18;
+  }
+  .hero--fabric .hero__text {
+    max-width: 31ch;
+    margin-top: 7px;
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+  .hero--fabric .hero__actions {
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .hero--fabric .hero__actions .btn {
+    min-height: 48px;
+    padding-inline: 12px;
+  }
+  .hero--fabric .hero__facts {
+    padding-block: 10px 12px;
+  }
+  .hero--fabric .hero__facts li {
+    gap: 4px;
+  }
+  .hero--fabric .hero__facts strong {
+    font-size: 0.72rem;
+  }
+  .hero--fabric .hero__facts small {
+    font-size: 0.68rem;
+  }
+
+  :root { --mobile-nav-h: 54px; }
+  .mobile-nav {
+    padding-top: 3px;
+    padding-bottom: calc(3px + var(--safe-bottom));
+  }
+  .mobile-nav__item {
+    min-height: 46px;
+    gap: 2px;
+    font-size: 0.7rem;
+  }
+  .mobile-nav__item svg {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+@media (max-width: 599px) {
+  .hero--fabric .hero__text {
+    max-width: 29ch;
+    margin-inline: auto;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+}

@@ -31,10 +31,7 @@ export function MobileNav() {
         <span>العروض</span>
       </NavLink>
       <NavLink to="/cart" className="mobile-nav__item" aria-label={`السلة، ${count} قطعة`}>
-        <span className="mobile-nav__icon">
-          <ShoppingBag size={21} aria-hidden="true" />
-          {count > 0 && <span className="mobile-nav__badge">{count > 99 ? '99+' : count}</span>}
-        </span>
+        <ShoppingBag size={21} aria-hidden="true" />
         <span aria-hidden="true">السلة</span>
       </NavLink>
       {wa && (
