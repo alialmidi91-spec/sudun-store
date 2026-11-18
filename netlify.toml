@@ -6,12 +6,13 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# معاينات الفروع وطلبات الدمج: فحص TypeScript كامل قبل البناء (الإنتاج يبقى بنفس أمر البناء الحالي)
+# معاينات الفروع وطلبات الدمج تستخدم أمر البناء نفسه للإنتاج حتى تكون المعاينة مطابقة للنسخة المنشورة.
+# فحص TypeScript يبقى متاحاً بشكل مستقل عبر npm run typecheck.
 [context.deploy-preview]
-  command = "npm run build:check"
+  command = "npm run build"
 
 [context.branch-deploy]
-  command = "npm run build:check"
+  command = "npm run build"
 
 # كل الصفحات (مثل /shop و /product/...) تفتح من index.html
 [[redirects]]
