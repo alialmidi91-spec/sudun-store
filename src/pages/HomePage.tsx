@@ -74,7 +74,7 @@ export default function HomePage() {
             </p>
             <h1 className="hero__title">أناقتچ تبدأ من سُدَن</h1>
             <p className="hero__text">
-              براند عراقي يقدم حجابات تجمع بين الأناقة، الجودة، والراحة بكل تفاصيلها.
+              حجابات مختارة بعناية، تجمع بين نعومة الخامة وأناقة التفاصيل.
             </p>
             <div className="hero__actions">
               <Link to="/shop" className="btn btn--light btn--lg">
