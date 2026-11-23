@@ -49,17 +49,26 @@ npm run preview    # معاينة نسخة الإنتاج
 
 ---
 
-## 3) النشر على الإنترنت
+## 3) النشر — Cloudflare فقط
 
-الموقع ثابت (Static) — ينشر مجاناً على أي من هذه:
+الاستضافة المعتمدة للمشروع هي **Cloudflare Workers** مع Static Assets (حسب `wrangler.jsonc`). لا تستخدم Netlify أو Vercel أو Cloudflare Pages لهذا المشروع.
 
-**Netlify (الأسهل):** ارفعي المشروع إلى GitHub ← Netlify ← *Add new site* ← اختاري المستودع.
-Build command: `npm run build` · Publish directory: `dist`.
-ملف `public/_redirects` موجود حتى تعمل روابط الصفحات عند التحديث.
+### نشر الإنتاج
+من جذر المشروع:
+```bash
+npm install
+npm run build
+npx wrangler deploy
+```
+ينشر `dist/` كـ Static Assets، ويعالج إعداد SPA في `wrangler.jsonc`.
 
-**Vercel:** *New Project* ← اختاري المستودع (يكتشف Vite تلقائياً). ملف `vercel.json` موجود لنفس الغرض.
-
-**Cloudflare Pages:** Build `npm run build` · Output `dist`. ملف `_redirects` يعمل هناك أيضاً.
+### معاينة منفصلة (بدون لمس الإنتاج)
+لبناء نسخة معاينة محلية:
+```bash
+npm run build
+npx wrangler deploy --name sudun-store-preview
+```
+هذا ينشئ Worker معاينة منفصل باسم `sudun-store-preview`؛ لا تغيّر اسم Worker الإنتاج `sudun-store` ولا تنشر عليه أثناء الاختبار.
 
 ## 4) ربط دومين سدن
 
