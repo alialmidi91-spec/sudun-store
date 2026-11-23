@@ -122,10 +122,17 @@ export function FabricCanvas() {
         gl.uniform2f(resolution, width, height);
       }
     };
+    // Canvas is decorative and intentionally has pointer-events:none, so listen on
+    // the hero instead; this lets the underlying product links remain clickable.
+    const pointerTarget = canvas.closest<HTMLElement>('.hero') ?? canvas;
     const onPointer = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
+      const rect = pointerTarget.getBoundingClientRect();
       cursor.x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
       cursor.y = 1 - Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+    };
+    const onPointerLeave = () => {
+      cursor.x = 0.72;
+      cursor.y = 0.46;
     };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -133,7 +140,8 @@ export function FabricCanvas() {
       if (!visible && frame) { cancelAnimationFrame(frame); frame = 0; }
     }, { threshold: 0.02 });
     observer.observe(canvas);
-    canvas.addEventListener('pointermove', onPointer, { passive: true });
+    pointerTarget.addEventListener('pointermove', onPointer, { passive: true });
+    pointerTarget.addEventListener('pointerleave', onPointerLeave, { passive: true });
     window.addEventListener('resize', resize, { passive: true });
     resize();
 
@@ -167,7 +175,8 @@ export function FabricCanvas() {
       disposed = true;
       if (frame) cancelAnimationFrame(frame);
       observer.disconnect();
-      canvas.removeEventListener('pointermove', onPointer);
+      pointerTarget.removeEventListener('pointermove', onPointer);
+      pointerTarget.removeEventListener('pointerleave', onPointerLeave);
       window.removeEventListener('resize', resize);
       reduced.removeEventListener?.('change', onMotionChange);
       gl.deleteBuffer(buffer);
